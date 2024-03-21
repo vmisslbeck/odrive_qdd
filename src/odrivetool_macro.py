@@ -35,7 +35,7 @@ class BLDCMotorConfig:
     # Tolerance for encoder offset float
     ENCODER_OFFSET_FLOAT_TOLERANCE = 0.05
 
-    def __init__(self, axis_num, erase_config):
+    def __init__(self, axis_num): #, erase_config=False):
         """
         Initalizes BLDCMotorConfig class by finding odrive, erase its
         configuration, and grabbing specified axis object.
@@ -48,7 +48,7 @@ class BLDCMotorConfig:
 
         self.axis_num = axis_num
 
-        self.erase_config = erase_config
+        # self.erase_config = erase_config
 
         # Connect to Odrive
         print("Looking for ODrive...")
@@ -57,7 +57,7 @@ class BLDCMotorConfig:
 
     def _find_odrive(self):
         # connect to Odrive
-        self.odrv = odrive.find_any(timeout=45)
+        self.odrv = odrive.find_any(timeout=15)
         self.odrv_axis = getattr(self.odrv, "axis{}".format(self.axis_num))
 
     def configure(self):
@@ -93,13 +93,13 @@ class BLDCMotorConfig:
         # odrv.axis0.config.commutation_encoder = EncoderId.ONBOARD_ENCODER0
 
 
-        if self.erase_config:
-            # Erase pre-exsisting configuration
-            print("Erasing pre-exsisting configuration...")
-            try:
-                self.odrv.erase_configuration()
-            except Exception:
-                pass
+        # if self.erase_config:
+        #     # Erase pre-exsisting configuration
+        #     print("Erasing pre-exsisting configuration...")
+        #     try:
+        #         self.odrv.erase_configuration()
+        #     except Exception:
+        #         pass
 
         self._find_odrive()
 
@@ -125,7 +125,7 @@ class BLDCMotorConfig:
 
         # Eagle Power 8308 BLDC has 40 Magnets,
         # so 40 poles, and thus 20 pole pairs
-        self.odrv_axis.motor.config.pole_pairs = 20
+        self.odrv.odrv_axis.motor.config.pole_pairs = 20
 
         # the Eagle Power 8308 is an Agricultural Drone Motor, so it needs a high
         # voltage to get the calibration right. The resistance calibration is
@@ -351,14 +351,14 @@ class BLDCMotorConfig:
         Puts the motor in idle (i.e. can move freely).
         """
 
-        self.odrv_axis.requested_state = AXIS_STATE_IDLE
+        self.odrv_axis.AxisState = AXIS_STATE_IDLE
 
     def mode_close_loop_control(self):
         """
         Puts the motor in closed loop control.
         """
 
-        self.odrv_axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+        self.odrv_axis.AxisState = CLOSED_LOOP_CONTROL
 
     def move_input_pos(self, angle):
         """
@@ -383,12 +383,12 @@ if __name__ == "__main__":
         help="Motor axis number which can only be 0 or 1.",
     )
 
-    # Argument for erase_config
-    parser.add_argument(
-        "--erase_config",
-        action="store_true",  # If present, set to True. If absent, set to False.
-        help="Flag to determine if the config should be erased.",
-    )
+    # # Argument for erase_config
+    # parser.add_argument(
+    #     "--erase_config",
+    #     action="store_true",  # If present, set to True. If absent, set to False.
+    #     help="Flag to determine if the config should be erased.",
+    # )
 
     # Argument to conduct motor test (make sure motor can move freely)
     parser.add_argument(
@@ -399,22 +399,22 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    hb_motor_config = BLDCMotorConfig(
-        axis_num=args.axis_num, erase_config=args.erase_config
+    bldc_motor_config = BLDCMotorConfig(
+        axis_num=args.axis_num#, erase_config=args.erase_config
     )
-    hb_motor_config.configure()
+    #bldc_motor_config.configure()
 
     if args.motor_test:
         print("Placing motor in close loop. If you move motor, motor will resist you.")
-        hb_motor_config.mode_close_loop_control()
+        bldc_motor_config.mode_close_loop_control()
 
         print("CONDUCTING MOTOR TEST")
 
         # Go from 0 to 360 degrees in increments of 30 degrees
         for angle in range(0, 390, 30):
             print("Setting motor to {} degrees.".format(angle))
-            hb_motor_config.move_input_pos(angle)
+            bldc_motor_config.move_input_pos(angle)
             time.sleep(5)
 
         print("Placing motor in idle. If you move motor, motor will move freely")
-        hb_motor_config.mode_idle()
+        bldc_motor_config.mode_idle()
