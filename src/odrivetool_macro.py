@@ -206,7 +206,7 @@ class BLDCMotorConfig:
 
         input("Make sure the motor is free to move, then press enter...")
 
-        print("Calibrating Odrive for hoverboard motor (you should hear a " "beep)...")
+        print("Calibrating Odrive for motor (you should hear a " "beep)...")
 
         self.odrv_axis.requested_state = AXIS_STATE_MOTOR_CALIBRATION
 
@@ -372,13 +372,13 @@ class BLDCMotorConfig:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Hoverboard Motor Calibration")
+    parser = argparse.ArgumentParser(description="BLDC Motor Calibration")
 
     # Argument for axis_num
     parser.add_argument(
         "--axis_num",
         type=int,
-        choices=[0, 1],  # Only allow 0 or 1
+        choices=[0, 1],  # Only allow 0 or 1 #acutally for modern odrives like the S1 and Pro the choices are only 0
         required=True,
         help="Motor axis number which can only be 0 or 1.",
     )
