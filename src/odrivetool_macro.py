@@ -21,8 +21,8 @@ class BLDCMotorConfig:
     Only works with one Odrive at a time.
     """
 
-    # Hoverboard Kv
-    HOVERBOARD_KV = 16.0
+    # BLDC Kv
+    BLDC_KV = 90.0
 
     # Min/Max phase inductance of motor
     MIN_PHASE_INDUCTANCE = 0
@@ -62,8 +62,36 @@ class BLDCMotorConfig:
 
     def configure(self):
         """
-        Configures the odrive device for a hoverboard motor.
+        Configures the odrive device for a BLDC motor.
         """
+        # dream settings
+        # odrv = odrv0
+        # odrv.config.dc_bus_overvoltage_trip_level = 30
+        # odrv.config.dc_bus_undervoltage_trip_level = 20
+        # odrv.config.dc_max_positive_current = 8
+        # odrv.config.dc_max_negative_current = -0.01
+        # odrv.config.brake_resistor0.enable = True
+        # odrv.config.brake_resistor0.resistance = 2
+        # odrv.axis0.config.motor.motor_type = MotorType.HIGH_CURRENT
+        # odrv.axis0.config.motor.torque_constant = 0.09188888888888888
+        # odrv.axis0.config.motor.pole_pairs = 20
+        # odrv.axis0.config.motor.current_soft_max = 22
+        # odrv.axis0.config.motor.current_hard_max = 38.6
+        # odrv.axis0.config.motor.calibration_current = 4
+        # odrv.axis0.config.motor.resistance_calib_max_voltage = 5
+        # odrv.axis0.config.calibration_lockin.current = 4
+        # odrv.axis0.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
+        # odrv.axis0.controller.config.input_mode = InputMode.VEL_RAMP
+        # odrv.axis0.controller.config.vel_ramp_rate = 10
+        # odrv.axis0.controller.config.vel_limit = 12
+        # odrv.axis0.controller.config.vel_limit_tolerance = 1.1666666666666667
+        # odrv.axis0.config.torque_soft_min = -0.404
+        # odrv.axis0.config.torque_soft_max = 0.404
+        # odrv.can.config.protocol = Protocol.NONE
+        # odrv.config.enable_uart_a = False
+        # odrv.axis0.config.load_encoder = EncoderId.ONBOARD_ENCODER0
+        # odrv.axis0.config.commutation_encoder = EncoderId.ONBOARD_ENCODER0
+
 
         if self.erase_config:
             # Erase pre-exsisting configuration
@@ -76,14 +104,14 @@ class BLDCMotorConfig:
         self._find_odrive()
 
         # Set this to True if using a brake resistor
-        self.odrv.config.enable_brake_resistor = True
+        self.odrv.config.brake_resistor0.enable = True
 
         # This is the resistance of the brake resistor. You can leave this
         # at the default setting if you are not using a brake resistor. Note
         # that there may be some extra resistance in your wiring and in the
         # screw terminals, so if you are getting issues while braking you may
         # want to increase this parameter by around 0.05 ohm.
-        # self.odrv_axis.config.brake_resistance  = 2.0
+        self.odrv.config.brake_resistor0.resistance = 2
 
         # This is the amount of current allowed to flow back into the power supply.
         # The convention is that it is negative. By default, it is set to a
@@ -95,16 +123,23 @@ class BLDCMotorConfig:
         # margin.
         # self.odrv_axis.config.dc_max_negative_current  = -0.01
 
-        # Standard 6.5 inch hoverboard hub motors have 30 permanent magnet
-        # poles, and thus 15 pole pairs
-        self.odrv_axis.motor.config.pole_pairs = 15
+        # Eagle Power 8308 BLDC has 40 Magnets,
+        # so 40 poles, and thus 20 pole pairs
+        self.odrv_axis.motor.config.pole_pairs = 20
 
-        # Hoverboard hub motors are quite high resistance compared to the hobby
-        # aircraft motors, so we want to use a bit higher voltage for the motor
-        # calibration, and set up the current sense gain to be more sensitive.
+        # the Eagle Power 8308 is an Agricultural Drone Motor, so it needs a high
+        # voltage to get the calibration right. The resistance calibration is
+        # particularly sensitive to the voltage, so we want to use a higher
+        # voltage for the calibration. The resistance_calib_max_voltage is the
+        # voltage that the ODrive will use to measure the resistance of the motor
+        # windings. The default value is 1V, but we can increase it to 4V to get
+        # a more accurate measurement. The resistance_calib_max_voltage should be
+        # set to a value that is higher than the voltage that the motor will
+        # actually see during operation.
         # The motors are also fairly high inductance, so we need to reduce the
         # bandwidth of the current controller from the default to keep it
         # stable.
+        
         self.odrv_axis.motor.config.resistance_calib_max_voltage = 4
         self.odrv_axis.motor.config.requested_current_range = 25
         self.odrv_axis.motor.config.current_control_bandwidth = 100
@@ -112,11 +147,10 @@ class BLDCMotorConfig:
         # Estimated KV but should be measured using the "drill test", which can
         # be found here:
         # https://discourse.odriverobotics.com/t/project-hoverarm/441
-        self.odrv_axis.motor.config.torque_constant = 8.27 / self.HOVERBOARD_KV
-
-        # Hoverboard motors contain hall effect sensors instead of incremental
-        # encorders
-        self.odrv_axis.encoder.config.mode = ENCODER_MODE_HALL
+        self.odrv_axis.motor.config.torque_constant = 8.27 / self.BLDC_KV
+        # For the BLDC we use the onboard encoder on the back of the odrive.
+        self.odrv_axis.config.load_encoder = EncoderId.ONBOARD_ENCODER0
+        self.odrv_axis.encoder.config
 
         # The hall feedback has 6 states for every pole pair in the motor. Since
         # we have 15 pole pairs, we set the cpr to 15*6 = 90.
