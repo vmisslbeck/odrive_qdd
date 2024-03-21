@@ -369,6 +369,7 @@ class BLDCMotorConfig:
         """
 
         self.odrv_axis.controller.input_pos = angle / 360.0
+        #self.odrv.Controller.input_pos = angle / 360.0
 
 
 if __name__ == "__main__":
@@ -409,7 +410,8 @@ if __name__ == "__main__":
         bldc_motor_config.mode_close_loop_control()
 
         print("CONDUCTING MOTOR TEST")
-
+        #try that 
+        bldc_motor_config.odrv.Controller.input_vel = 0.5
         # Go from 0 to 360 degrees in increments of 30 degrees
         for angle in range(0, 390, 30):
             print("Setting motor to {} degrees.".format(angle))
