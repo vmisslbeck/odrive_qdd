@@ -351,14 +351,14 @@ class BLDCMotorConfig:
         Puts the motor in idle (i.e. can move freely).
         """
 
-        self.odrv_axis.AxisState = AXIS_STATE_IDLE
+        self.odrv_axis.requested_state = AxisState.IDLE
 
     def mode_close_loop_control(self):
         """
         Puts the motor in closed loop control.
         """
 
-        self.odrv_axis.AxisState = CLOSED_LOOP_CONTROL
+        self.odrv_axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
 
     def move_input_pos(self, angle):
         """
@@ -368,8 +368,8 @@ class BLDCMotorConfig:
         :type angle: int or float
         """
 
+        #self.odrv_axis.controller.input_pos = angle / 360.0
         self.odrv_axis.controller.input_pos = angle / 360.0
-        #self.odrv.Controller.input_pos = angle / 360.0
 
 
 if __name__ == "__main__":
@@ -411,12 +411,19 @@ if __name__ == "__main__":
 
         print("CONDUCTING MOTOR TEST")
         #try that 
-        bldc_motor_config.odrv.Controller.input_vel = 0.5
+        #bldc_motor_config.odrv.Controller.input_vel = 0.5
         # Go from 0 to 360 degrees in increments of 30 degrees
         for angle in range(0, 390, 30):
             print("Setting motor to {} degrees.".format(angle))
             bldc_motor_config.move_input_pos(angle)
-            time.sleep(5)
+            time.sleep(0.03)
+
+        # Go from 360 to 0 degrees in increments of 30 degrees
+        for angle in range(330, -30, -30):
+            print("Setting motor to {} degrees.".format(angle))
+            bldc_motor_config.move_input_pos(angle)
+            time.sleep(0.03)
+        
 
         print("Placing motor in idle. If you move motor, motor will move freely")
         bldc_motor_config.mode_idle()
