@@ -60,6 +60,12 @@ class BLDCMotorConfig:
         self.odrv = odrive.find_any(timeout=15)
         self.odrv_axis = getattr(self.odrv, "axis{}".format(self.axis_num))
 
+    def clear_errors(self):
+        """
+        Clears all errors on the odrive.
+        """
+        self.odrv.clear_errors()
+
     def configure(self):
         """
         Configures the odrive device for a BLDC motor.
@@ -407,6 +413,7 @@ if __name__ == "__main__":
 
     if args.motor_test:
         print("Placing motor in close loop. If you move motor, motor will resist you.")
+        bldc_motor_config.clear_errors()
         bldc_motor_config.mode_close_loop_control()
 
         print("CONDUCTING MOTOR TEST")
