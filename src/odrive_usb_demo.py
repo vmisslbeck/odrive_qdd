@@ -12,17 +12,20 @@ import math
 
 def calibrate_motor(motor):
     print("Calibrating motor...")
-    motor.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
-    while motor.current_state != AXIS_STATE_IDLE:
+    motor.requested_state = AxisState.FULL_CALIBRATION_SEQUENCE
+    while motor.current_state != AxisState.IDLE:
         time.sleep(0.1)
     print("Motor calibrated.")
-    motor.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+    motor.requested_state = AxisState.CLOSED_LOOP_CONTROL
 
 
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
 print(odrive.connected_devices)
+print(odrive.find_any())
 my_drive = odrive.find_any()
+print(odrive.find_any())
+print("Odrive found!")
 print(odrive.connected_devices)
 my_drive.clear_errors()
 
