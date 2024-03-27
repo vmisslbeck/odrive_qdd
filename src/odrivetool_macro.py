@@ -72,53 +72,23 @@ class BLDCMotorConfig:
         """
         # dream settings
         # odrv = odrv0
-        # odrv.config.dc_bus_overvoltage_trip_level = 30
-        # odrv.config.dc_bus_undervoltage_trip_level = 20
-        # odrv.config.dc_max_positive_current = 8
-        # odrv.config.dc_max_negative_current = -0.01
-        # odrv.config.brake_resistor0.enable = True
-        # odrv.config.brake_resistor0.resistance = 2
-        # odrv.axis0.config.motor.motor_type = MotorType.HIGH_CURRENT
-        # odrv.axis0.config.motor.torque_constant = 0.09188888888888888
-        # odrv.axis0.config.motor.pole_pairs = 20
-        # odrv.axis0.config.motor.current_soft_max = 22
-        # odrv.axis0.config.motor.current_hard_max = 38.6
-        # odrv.axis0.config.motor.calibration_current = 4
-        # odrv.axis0.config.motor.resistance_calib_max_voltage = 5
-        # odrv.axis0.config.calibration_lockin.current = 4
-        # odrv.axis0.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
-        # odrv.axis0.controller.config.input_mode = InputMode.VEL_RAMP
-        # odrv.axis0.controller.config.vel_ramp_rate = 10
-        # odrv.axis0.controller.config.vel_limit = 12
-        # odrv.axis0.controller.config.vel_limit_tolerance = 1.1666666666666667
-        # odrv.axis0.config.torque_soft_min = -0.404
-        # odrv.axis0.config.torque_soft_max = 0.404
-        # odrv.can.config.protocol = Protocol.NONE
-        # odrv.config.enable_uart_a = False
-        # odrv.axis0.config.load_encoder = EncoderId.ONBOARD_ENCODER0
-        # odrv.axis0.config.commutation_encoder = EncoderId.ONBOARD_ENCODER0
+        
 
 
-        # if self.erase_config:
-        #     # Erase pre-exsisting configuration
-        #     print("Erasing pre-exsisting configuration...")
-        #     try:
-        #         self.odrv.erase_configuration()
-        #     except Exception:
-        #         pass
+        if self.erase_config:
+            # Erase pre-exsisting configuration
+            print("Erasing pre-exsisting configuration...")
+            try:
+                self.odrv.erase_configuration()
+            except Exception:
+                pass
 
         self._find_odrive()
 
         # Set this to True if using a brake resistor
-        self.odrv.config.brake_resistor0.enable = True
-
-        # This is the resistance of the brake resistor. You can leave this
-        # at the default setting if you are not using a brake resistor. Note
-        # that there may be some extra resistance in your wiring and in the
-        # screw terminals, so if you are getting issues while braking you may
-        # want to increase this parameter by around 0.05 ohm.
-        self.odrv.config.brake_resistor0.resistance = 2
-
+        self.odrv.config.dc_bus_overvoltage_trip_level = 30
+        self.odrv.config.dc_bus_undervoltage_trip_level = 20
+        self.odrv.config.dc_max_positive_current = 8
         # This is the amount of current allowed to flow back into the power supply.
         # The convention is that it is negative. By default, it is set to a
         # conservative value of 10mA. If you are using a brake resistor and getting
@@ -127,12 +97,25 @@ class BLDCMotorConfig:
         # supply, set this to a safe level for your power source. Note that in that
         # case, it should be higher than your motor current limit + current limit
         # margin.
-        # self.odrv_axis.config.dc_max_negative_current  = -0.01
-
+        self.odrv.config.dc_max_negative_current = -0.01
+        self.odrv.config.brake_resistor0.enable = True
+        # This is the resistance of the brake resistor. You can leave this
+        # at the default setting if you are not using a brake resistor. Note
+        # that there may be some extra resistance in your wiring and in the
+        # screw terminals, so if you are getting issues while braking you may
+        # want to increase this parameter by around 0.05 ohm.
+        self.odrv.config.brake_resistor0.resistance = 2
+        self.odrv.axis0.config.motor.motor_type = MotorType.HIGH_CURRENT
+        # Estimated KV but should be measured using the "drill test", which can
+        # be found here:
+        # https://discourse.odriverobotics.com/t/project-hoverarm/441
+        self.odrv.axis0.config.motor.torque_constant = 8.27 / self.BLDC_KV # for EaglePower8308 90KV = 0.09188888888888888
         # Eagle Power 8308 BLDC has 40 Magnets,
         # so 40 poles, and thus 20 pole pairs
-        self.odrv.odrv_axis.motor.config.pole_pairs = 20
-
+        self.odrv.axis0.config.motor.pole_pairs = 20
+        self.odrv.axis0.config.motor.current_soft_max = 22
+        self.odrv.axis0.config.motor.current_hard_max = 38.6
+        self.odrv.axis0.config.motor.calibration_current = 4
         # the Eagle Power 8308 is an Agricultural Drone Motor, so it needs a high
         # voltage to get the calibration right. The resistance calibration is
         # particularly sensitive to the voltage, so we want to use a higher
@@ -145,57 +128,31 @@ class BLDCMotorConfig:
         # The motors are also fairly high inductance, so we need to reduce the
         # bandwidth of the current controller from the default to keep it
         # stable.
-        
-        self.odrv_axis.motor.config.resistance_calib_max_voltage = 4
-        self.odrv_axis.motor.config.requested_current_range = 25
-        self.odrv_axis.motor.config.current_control_bandwidth = 100
-
-        # Estimated KV but should be measured using the "drill test", which can
-        # be found here:
-        # https://discourse.odriverobotics.com/t/project-hoverarm/441
-        self.odrv_axis.motor.config.torque_constant = 8.27 / self.BLDC_KV
+        self.odrv.axis0.config.motor.resistance_calib_max_voltage = 5
+        self.odrv.axis0.config.calibration_lockin.current = 4
+        self.odrv.axis0.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
+        self.odrv.axis0.controller.config.input_mode = InputMode.VEL_RAMP
+        self.odrv.axis0.controller.config.vel_ramp_rate = 10
+        self.odrv.axis0.controller.config.vel_limit = 12
+        self.odrv.axis0.controller.config.vel_limit_tolerance = 1.1666666666666667
+        self.odrv.axis0.config.torque_soft_min = -0.404
+        self.odrv.axis0.config.torque_soft_max = 0.404
+        self.odrv.can.config.protocol = Protocol.NONE
+        self.odrv.config.enable_uart_a = False
         # For the BLDC we use the onboard encoder on the back of the odrive.
-        self.odrv_axis.config.load_encoder = EncoderId.ONBOARD_ENCODER0
-        self.odrv_axis.encoder.config
-
-        # The hall feedback has 6 states for every pole pair in the motor. Since
-        # we have 15 pole pairs, we set the cpr to 15*6 = 90.
-        self.odrv_axis.encoder.config.cpr = 90
-
-        # Since hall sensors are low resolution feedback, we also bump up the
-        # offset calibration displacement to get better calibration accuracy.
-        self.odrv_axis.encoder.config.calib_scan_distance = 150
-
-        # Since the hall feedback only has 90 counts per revolution, we want to
-        # reduce the velocity tracking bandwidth to get smoother velocity
-        # estimates. We can also set these fairly modest gains that will be a
-        # bit sloppy but shouldn’t shake your rig apart if it’s built poorly.
-        # Make sure to tune the gains up when you have everything else working
-        # to a stiffness that is applicable to your application.
-        self.odrv_axis.encoder.config.bandwidth = 100
-        self.odrv_axis.controller.config.pos_gain = 6
-        self.odrv_axis.controller.config.vel_gain = (
-            0.02
-            * self.odrv_axis.motor.config.torque_constant
-            * self.odrv_axis.encoder.config.cpr
-        )
-        self.odrv_axis.controller.config.vel_integrator_gain = (
-            0.1
-            * self.odrv_axis.motor.config.torque_constant
-            * self.odrv_axis.encoder.config.cpr
-        )
-        self.odrv_axis.controller.config.vel_limit = 10
+        self.odrv.axis0.config.load_encoder = EncoderId.ONBOARD_ENCODER0
+        self.odrv.axis0.config.commutation_encoder = EncoderId.ONBOARD_ENCODER0
 
         # Set in position control mode so we can control the position of the
         # wheel
-        self.odrv_axis.controller.config.control_mode = CONTROL_MODE_POSITION_CONTROL
+        self.odrv_axis.controller.config = ControlMode.POSITION_CONTROL
 
         # In the next step we are going to start powering the motor and so we
         # want to make sure that some of the above settings that require a
         # reboot are applied first.
 
         # Motors must be in IDLE mode before saving
-        self.odrv_axis.requested_state = AXIS_STATE_IDLE
+        self.odrv_axis.requested_state = AxisState.IDLE
         try:
             print("Saving manual configuration and rebooting...")
             is_saved = self.odrv.save_configuration()
@@ -214,10 +171,10 @@ class BLDCMotorConfig:
 
         print("Calibrating Odrive for motor (you should hear a " "beep)...")
 
-        self.odrv_axis.requested_state = AXIS_STATE_MOTOR_CALIBRATION
+        self.odrv_axis.requested_state = AxisState.MOTOR_CALIBRATION
 
         # Wait for calibration to take place
-        time.sleep(10)
+        time.sleep(15)
 
         if self.odrv_axis.motor.error != 0:
             print(
@@ -269,16 +226,6 @@ class BLDCMotorConfig:
         # If all looks good, then lets tell ODrive that saving this calibration
         # to persistent memory is OK
         self.odrv_axis.motor.config.pre_calibrated = True
-
-        # Check the alignment between the motor and the hall sensor. Because of
-        # this step you are allowed to plug the motor phases in random order and
-        # also the hall signals can be random. Just don’t change it after
-        # calibration.
-        print("Calibrating Odrive for hall encoder...")
-        self.odrv_axis.requested_state = AXIS_STATE_ENCODER_HALL_POLARITY_CALIBRATION
-
-        # Wait for calibration to take place
-        time.sleep(15)
 
         if self.odrv_axis.encoder.error != 0:
             print(
