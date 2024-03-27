@@ -68,13 +68,8 @@ class BLDCMotorConfig:
 
     def configure(self):
         """
-        Configures the odrive device for a BLDC motor.
+        Configures the odrive for a BLDC motor.
         """
-        # dream settings
-        # odrv = odrv0
-        
-
-
         if self.erase_config:
             # Erase pre-exsisting configuration
             print("Erasing pre-exsisting configuration...")
