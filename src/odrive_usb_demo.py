@@ -41,12 +41,25 @@ def find_one_odrive():
     time.sleep(0.5)
     return odrv
 
-    # print(type(odrive.find_any())) # : <class 'fibre.libfibre.anonymous_interface_2380363422560'>
-    # if you want to use more than one odrive, you can use the following code
-    #odrive.find_any()
-    #my_drive1 = odrive.connected_devices[0]
-    #my_drive2 = odrive.connected_devices[1]
-    #...
+def find_all_odrives():
+    '''
+    if you want to use more than one odrive
+    to use the object, you can do this:
+    my_drive0 = find_all_odrives()[0]
+    '''
+    #print(type(odrive.find_any())) # : <class 'fibre.libfibre.anonymous_interface_2380363422560'>
+
+    # we use find_any because it will start a background thread that handles the backend,
+    # so in the end we can access odrive.connected_devices
+    odrive.find_any()
+    od_list = []
+    for i in range(len(odrive.connected_devices)):
+        odrv = odrive.connected_devices[i]
+        od_list.append(odrv)
+
+    return od_list
+
+
 my_drive = find_one_odrive()
 print("Bus voltage is " + str(my_drive.vbus_voltage) + " V")
 if my_drive.vbus_voltage < 20.0:
