@@ -30,20 +30,24 @@ def print_GPIO_voltage(odrv):
     for i in [1,2,3,4]:
         print('voltage on GPIO{} is {} Volt'.format(i, odrv.get_adc_voltage(i)))
 
+def find_one_odrive():
+    ''' 
+    Find a connected ODrive (this will block until you connect one)
+    '''
+    print("finding an odrive...")
+    odrv = odrive.find_any()
+    print("Odrive found!")
+    odrv.clear_errors()
+    time.sleep(0.5)
+    return odrv
 
-# Find a connected ODrive (this will block until you connect one)
-print("finding an odrive...")
     # print(type(odrive.find_any())) # : <class 'fibre.libfibre.anonymous_interface_2380363422560'>
     # if you want to use more than one odrive, you can use the following code
     #odrive.find_any()
     #my_drive1 = odrive.connected_devices[0]
     #my_drive2 = odrive.connected_devices[1]
     #...
-my_drive = odrive.find_any()
-print("Odrive found!")
-my_drive.clear_errors()
-time.sleep(0.5)
-
+my_drive = find_one_odrive()
 print("Bus voltage is " + str(my_drive.vbus_voltage) + " V")
 if my_drive.vbus_voltage < 20.0:
     print("vbus voltage is too low! Please connect a power supply to the ODrive")
