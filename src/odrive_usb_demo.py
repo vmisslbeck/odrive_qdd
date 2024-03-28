@@ -59,14 +59,21 @@ def find_all_odrives():
 
     return od_list
 
+def check_voltage(odrv, voltage:float =20.0):
+    ''' 
+    Check if the voltage is high enough to run the motor.
+    Input argument looks like this: my_drive (odrive object), voltage (float)
+    '''
+    print("Bus voltage is " + str(odrv.vbus_voltage) + " V")
+    if odrv.vbus_voltage < voltage:
+        print("vbus voltage is too low! Please connect a power supply to the ODrive")
+        while odrv.vbus_voltage < voltage:
+            time.sleep(2)
+            print("...")
+
 
 my_drive = find_one_odrive()
-print("Bus voltage is " + str(my_drive.vbus_voltage) + " V")
-if my_drive.vbus_voltage < 20.0:
-    print("vbus voltage is too low! Please connect a power supply to the ODrive")
-    while my_drive.vbus_voltage < 20:
-        time.sleep(2)
-        print("...")
+check_voltage(my_drive)
 
 time.sleep(1)
 my_drive.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
