@@ -1,5 +1,7 @@
 # ODrive Framework
 
+pls note that this whole repository is still in progress. dont consider to use it by now
+
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/vmisslbeck/odrive_qdd/blob/main/LICENSE)
 
 The odrive_qdd Interface is a powerful tool for configuring, controlling, and manipulating ODrive motor controllers and motors that are not directly interfaced with ODrive.
@@ -12,18 +14,11 @@ The odrive_qdd Interface is a powerful tool for configuring, controlling, and ma
 
 ## Installation
 
-To install the ODrive Framework, follow these steps:
 
-1. Clone the repository:
-
-    ```bash
-    git clone https://github.com/vmisslbeck/odrive_qdd.git
-    ```
-
-2. Install the required dependencies:
+1. Install the required dependencies:
 
     ```bash
-    pip install -r requirements.txt
+    pip install odrive
     ```
 
 ## Usage
@@ -47,7 +42,7 @@ To use the ODrive Framework, follow these steps:
 
 ## Contributing
 
-Contributions are welcome! If you would like to contribute to the odrive_qdd Interface, please follow the guidelines outlined in [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions are welcome!
 
 ## License
 
