@@ -77,7 +77,7 @@ class movements:
     def __init__(self, odrv):
         self.odrv = odrv
 
-    def sine_wave(self, t0, SINE_PERIOD = 2):
+    def sine_wave(self, t0: float, SINE_PERIOD: float = 2):
         ''' 
         A sine wave to eternity.
         the smaller the value of SINE_PERIOD, the faster the motor will spin
@@ -111,11 +111,3 @@ except KeyboardInterrupt:
     my_drive.axis0.requested_state = AxisState.IDLE
     print("Motor stopped.")
     pass
-
-
-        # SINE_PERIOD = 2 # the smaller this value, the faster the motor will spin
-        # t = time.monotonic() - t0
-        # phase = t * (2 * math.pi / SINE_PERIOD)
-        # setpoint = math.sin(phase)
-        # my_drive.axis0.controller.input_pos = setpoint
-        # time.sleep(0.01)
