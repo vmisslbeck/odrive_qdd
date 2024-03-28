@@ -22,6 +22,14 @@ def calibrate_motor(motor):
     print("Motor calibrated.")
     motor.requested_state = AxisState.CLOSED_LOOP_CONTROL
 
+def print_GPIO_voltage(odrv):
+    ''' 
+    Print the voltage on GPIO pinS.
+    Input arguments look like this: my_drive (odrive object)
+    '''
+    for i in [1,2,3,4]:
+        print('voltage on GPIO{} is {} Volt'.format(i, odrv.get_adc_voltage(i)))
+
 
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
@@ -49,12 +57,6 @@ my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
 print("setpoint: " + str(my_drive.axis0.controller.pos_setpoint))
 
 time.sleep(1)
-# And this is how function calls are done:
-# for i in [1,2,3,4]:
-#    print('voltage on GPIO{} is {} Volt'.format(i, my_drive.get_adc_voltage(i)))
-
-# Calibrate motor and wait for it to finish
-# calibrate_motor(my_drive.axis0)
 
 # A sine wave to test
 t0 = time.monotonic()
