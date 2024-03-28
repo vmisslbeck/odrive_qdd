@@ -87,6 +87,9 @@ class movements:
         setpoint = math.sin(phase)
         self.odrv.axis0.controller.input_pos = setpoint
         time.sleep(0.01)
+        if self.odrv.axis0.disarm_reason != 0:
+            print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
+            raise KeyboardInterrupt
 
 
 my_drive = find_one_odrive()
