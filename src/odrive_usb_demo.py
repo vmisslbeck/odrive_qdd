@@ -11,6 +11,10 @@ import time
 import math
 
 def calibrate_motor(motor):
+    ''' 
+    Calibrate motor and wait for it to finish.
+    Input argument looks like this: odrive.axis0 
+    '''
     print("Calibrating motor...")
     motor.requested_state = AxisState.FULL_CALIBRATION_SEQUENCE
     while motor.current_state != AxisState.IDLE:
@@ -21,14 +25,18 @@ def calibrate_motor(motor):
 
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
-#print(odrive.connected_devices)
-print(type(odrive.find_any()))
+    # print(type(odrive.find_any())) # : <class 'fibre.libfibre.anonymous_interface_2380363422560'>
+    # if you want to use more than one odrive, you can use the following code
+    #odrive.find_any()
+    #my_drive1 = odrive.connected_devices[0]
+    #my_drive2 = odrive.connected_devices[1]
+    #...
 my_drive = odrive.find_any()
 print("Odrive found!")
-#print(odrive.connected_devices)
 my_drive.clear_errors()
-time.sleep(0.5) 
-print("Bus voltage is " + str(my_drive.vbus_voltage) + "V")
+time.sleep(0.5)
+
+print("Bus voltage is " + str(my_drive.vbus_voltage) + " V")
 if my_drive.vbus_voltage < 20.0:
     print("vbus voltage is too low! Please connect a power supply to the ODrive")
     while my_drive.vbus_voltage < 20:
@@ -39,6 +47,7 @@ time.sleep(1)
 my_drive.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
 my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
 print("setpoint: " + str(my_drive.axis0.controller.pos_setpoint))
+
 time.sleep(1)
 # And this is how function calls are done:
 # for i in [1,2,3,4]:
