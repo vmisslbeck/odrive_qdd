@@ -27,14 +27,19 @@ my_drive = odrive.find_any()
 print("Odrive found!")
 #print(odrive.connected_devices)
 my_drive.clear_errors()
-
-# To read a value, simply read the property
+time.sleep(0.5) 
 print("Bus voltage is " + str(my_drive.vbus_voltage) + "V")
+if my_drive.vbus_voltage < 20.0:
+    print("vbus voltage is too low! Please connect a power supply to the ODrive")
+    while my_drive.vbus_voltage < 20:
+        time.sleep(2)
+        print("...")
 
-# Or to change a value, just assign to the property
-my_drive.axis0.controller.input_pos = 3.14
-print("Position setpoint is " + str(my_drive.axis0.controller.pos_setpoint))
-
+time.sleep(1)
+my_drive.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
+my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
+print("setpoint: " + str(my_drive.axis0.controller.pos_setpoint))
+time.sleep(1)
 # And this is how function calls are done:
 # for i in [1,2,3,4]:
 #    print('voltage on GPIO{} is {} Volt'.format(i, my_drive.get_adc_voltage(i)))
@@ -42,15 +47,12 @@ print("Position setpoint is " + str(my_drive.axis0.controller.pos_setpoint))
 # Calibrate motor and wait for it to finish
 # calibrate_motor(my_drive.axis0)
 
-my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
 # A sine wave to test
-print("setpoint: ", my_drive.axis0.controller.pos_setpoint)
-time.sleep(1)
 t0 = time.monotonic()
 try:
     while True:
   
-        SINE_PERIOD = 2.0
+        SINE_PERIOD = 2 # the smaller this value, the faster the motor will spin
         t = time.monotonic() - t0
         phase = t * (2 * math.pi / SINE_PERIOD)
         setpoint = math.sin(phase)
