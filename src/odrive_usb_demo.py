@@ -73,9 +73,10 @@ def check_voltage(odrv, voltage:float =20.0):
 
 
 class movements:
-
+    ''' for the movements class, the odrive has to be '''
     def __init__(self, odrv):
         self.odrv = odrv
+        odrv.axis0.controller.config.control_mode = ControlMode.POSITION_CONTROL
 
     def sine_wave(self, t0: float, SINE_PERIOD: float = 2):
         ''' 
