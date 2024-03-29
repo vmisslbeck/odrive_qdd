@@ -92,6 +92,18 @@ class movements:
             print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
             raise KeyboardInterrupt
 
+    def move_like_a_watch(self):
+        ''' 
+        Move the motor like a watch.
+        '''
+        for i in range(60):
+            self.odrv.axis0.controller.input_pos = i/60
+            time.sleep(1)
+
+            if self.odrv.axis0.disarm_reason != 0:
+                print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
+                raise KeyboardInterrupt
+        
 
 my_drive = find_one_odrive()
 check_voltage(my_drive)
