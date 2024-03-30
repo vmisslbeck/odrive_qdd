@@ -3,6 +3,7 @@ from __future__ import print_function
 import odrive
 from odrive.enums import *
 import time
+from pynput import keyboard
 import math
 
 
@@ -75,6 +76,25 @@ class velocity_movements:
         '''
         self._set_ctrl_mode()
         self.odrv.axis0.controller.input_vel = velocity
+
+    def control_by_input(self):
+        """
+        With this method you can control the odrive with your arrow keys.
+        Press arrow_up to increase velocity, arrow_down to decrease velocity.
+        """
+        self._set_ctrl_mode()
+        print("Press arrow_up to increase velocity, arrow_down to decrease velocity, q to quit: ")
+        while True:
+            with keyboard.Events() as events:
+        # Block for as much as possible
+                
+                event = events.get(1e6)
+                if event.key == keyboard.KeyCode.from_char('q'):
+                    break
+                elif event.key == keyboard.Key.up:
+                    self.odrv.axis0.controller.input_vel += 1
+                elif event.key == keyboard.Key.down:
+                    self.odrv.axis0.controller.input_vel -= 1
 
     def move_back_and_forth(self, duration:float , velocity: float = 1):
         ''' 
