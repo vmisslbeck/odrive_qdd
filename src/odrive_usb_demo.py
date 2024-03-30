@@ -142,6 +142,17 @@ class velocity_movements:
         self._set_ctrl_mode()
         self.odrv.axis0.controller.input_vel = velocity
 
+    def move_back_and_forth(self, velocity: float = 1):
+        ''' 
+        Move back and forth.
+        '''
+        self._set_ctrl_mode()
+        self.odrv.axis0.controller.input_vel = velocity
+        time.sleep(2)
+        self.odrv.axis0.controller.input_vel = -velocity
+        time.sleep(2)
+        self.odrv.axis0.controller.input_vel = 0
+
 
 my_drive = find_one_odrive()
 check_voltage(my_drive)
