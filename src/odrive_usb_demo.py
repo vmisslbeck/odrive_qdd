@@ -4,11 +4,8 @@ Example usage of the ODrive python library to monitor and control ODrive devices
 """
 
 from __future__ import print_function
-
-import odrive
 from odrive.enums import *
 import time
-import math
 import odrv_movements
 import odrv_con_and_calib
 
