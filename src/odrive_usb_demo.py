@@ -72,7 +72,7 @@ def check_voltage(odrv, voltage:float =20.0):
             print("...")
 
 
-class movements:
+class position_movements:
     ''' for the movements class, the odrive has to be '''
     def __init__(self, odrv):
         self.odrv = odrv
@@ -104,6 +104,24 @@ class movements:
                 print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
                 raise KeyboardInterrupt
         
+class velocity_movements:
+
+    def __init__(self, odrv):
+        self.odrv = odrv
+        odrv.axis0.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
+
+    def vel_stop(self):
+        ''' 
+        Stop the motor.
+        '''
+        self.odrv.axis0.controller.input_vel = 0
+
+    def pedal_controlled(self, velocity: float = 1):
+        ''' 
+        Pedal controlled movement.
+        '''
+        self.odrv.axis0.controller.input_vel = velocity
+
 
 my_drive = find_one_odrive()
 check_voltage(my_drive)
@@ -116,7 +134,7 @@ print("setpoint: " + str(my_drive.axis0.controller.pos_setpoint))
 time.sleep(1)
 
 # A sine wave to test
-move = movements(my_drive)
+move = position_movements(my_drive)
 t0 = time.monotonic()
 try:
     while True:
