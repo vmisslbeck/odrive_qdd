@@ -234,7 +234,7 @@ class BLDCMotorConfig:
             sys.exit(1)
 
         print("Calibrating Odrive for encoder offset...")
-        self.odrv_axis.requested_state = AXIS_STATE_ENCODER_OFFSET_CALIBRATION
+        self.odrv_axis.requested_state = AxisState.ENCODER_OFFSET_CALIBRATION
 
         # Wait for calibration to take place
         time.sleep(30)
@@ -255,7 +255,7 @@ class BLDCMotorConfig:
         self.odrv_axis.encoder.config.pre_calibrated = True
 
         print("Calibrating Odrive for anticogging...")
-        self.odrv_axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+        self.odrv_axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
 
         self.odrv_axis.controller.start_anticogging_calibration()
 
@@ -279,7 +279,7 @@ class BLDCMotorConfig:
         self.odrv_axis.controller.config.anticogging.pre_calibrated = True
 
         # Motors must be in IDLE mode before saving
-        self.odrv_axis.requested_state = AXIS_STATE_IDLE
+        self.odrv_axis.requested_state = AxisState.IDLE
         try:
             print("Saving calibration configuration and rebooting...")
             self.odrv.save_configuration()
@@ -365,13 +365,13 @@ if __name__ == "__main__":
         for angle in range(0, 390, 30):
             print("Setting motor to {} degrees.".format(angle))
             bldc_motor_config.move_input_pos(angle)
-            time.sleep(0.03)
+            time.sleep(0.5)
 
         # Go from 360 to 0 degrees in increments of 30 degrees
         for angle in range(330, -30, -30):
             print("Setting motor to {} degrees.".format(angle))
             bldc_motor_config.move_input_pos(angle)
-            time.sleep(0.03)
+            time.sleep(0.5)
         
 
         print("Placing motor in idle. If you move motor, motor will move freely")
