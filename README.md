@@ -19,6 +19,7 @@ The odrive_qdd Interface is a powerful tool for configuring, controlling, and ma
 
     ```bash
     pip install odrive
+    pip install pynput
     ```
 
 ## Usage
