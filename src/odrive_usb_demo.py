@@ -76,13 +76,26 @@ class position_movements:
     ''' for the movements class, the odrive has to be '''
     def __init__(self, odrv):
         self.odrv = odrv
-        odrv.axis0.controller.config.control_mode = ControlMode.POSITION_CONTROL
+
+    def _set_ctrl_mode(self, mode: ControlMode = ControlMode.POSITION_CONTROL):
+        ''' 
+        Set the control mode.
+        '''
+        self.odrv.axis0.controller.config.control_mode = mode
+
+    def move_to_position(self, position: float):
+        ''' 
+        Move to a specific position.
+        '''
+        self._set_ctrl_mode()
+        self.odrv.axis0.controller.input_pos = position
 
     def sine_wave(self, t0: float, SINE_PERIOD: float = 2):
         ''' 
         A sine wave to eternity.
         the smaller the value of SINE_PERIOD, the faster the motor will spin
         '''
+        self._set_ctrl_mode()
         t = time.monotonic() - t0
         phase = t * (2 * math.pi / SINE_PERIOD)
         setpoint = math.sin(phase)
@@ -96,6 +109,7 @@ class position_movements:
         ''' 
         Move the motor like a watch.
         '''
+        self._set_ctrl_mode()
         for i in range(60):
             self.odrv.axis0.controller.input_pos = i/60
             time.sleep(1)
@@ -108,7 +122,12 @@ class velocity_movements:
 
     def __init__(self, odrv):
         self.odrv = odrv
-        odrv.axis0.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
+
+    def _set_ctrl_mode(self, mode: ControlMode = ControlMode.VELOCITY_CONTROL):
+        ''' 
+        Set the control mode.
+        '''
+        self.odrv.axis0.controller.config.control_mode = mode
 
     def vel_stop(self):
         ''' 
@@ -120,6 +139,7 @@ class velocity_movements:
         ''' 
         Pedal controlled movement.
         '''
+        self._set_ctrl_mode()
         self.odrv.axis0.controller.input_vel = velocity
 
 
@@ -135,10 +155,12 @@ time.sleep(1)
 
 # A sine wave to test
 move = position_movements(my_drive)
+vel_move = velocity_movements(my_drive)
+
 t0 = time.monotonic()
 try:
     while True:
-  
+
         move.sine_wave(t0)
 
 except KeyboardInterrupt:
