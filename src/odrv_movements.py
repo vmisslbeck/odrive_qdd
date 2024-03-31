@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-import odrive
 from odrive.enums import *
 import time
 from pynput import keyboard
@@ -20,7 +19,7 @@ class position_movements:
 
     def disarm_interrupt(self):
         '''
-        chechks if the motor is disarmed , prints the reason and raises a KeyboardInterrupt
+        checks if the motor is disarmed , prints the reason and raises a KeyboardInterrupt
         '''
         if self.odrv.axis0.disarm_reason != 0:
             print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
@@ -85,9 +84,9 @@ class velocity_movements:
         '''
         self.odrv.axis0.controller.input_vel = 0
 
-    def pedal_controlled(self, velocity: float = 1):
+    def vel_controlled(self, velocity: float = 1):
         ''' 
-        Pedal controlled movement.
+        velocity controlled movement. use this method to move the motor with a specific velocity.
         '''
         self._set_ctrl_mode()
         self.odrv.axis0.controller.input_vel = velocity
