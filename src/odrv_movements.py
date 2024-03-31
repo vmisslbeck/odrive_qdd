@@ -18,12 +18,22 @@ class position_movements:
         '''
         self.odrv.axis0.controller.config.control_mode = mode
 
+    def disarm_interrupt(self):
+        '''
+        chechks if the motor is disarmed , prints the reason and raises a KeyboardInterrupt
+        '''
+        if self.odrv.axis0.disarm_reason != 0:
+            print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
+            raise KeyboardInterrupt
+
     def move_to_position(self, position: float):
         ''' 
         Move to a specific position.
         '''
         self._set_ctrl_mode()
         self.odrv.axis0.controller.input_pos = position
+
+        self.disarm_interrupt()
 
     def sine_wave(self, t0: float, SINE_PERIOD: float = 2):
         ''' 
@@ -36,9 +46,8 @@ class position_movements:
         setpoint = math.sin(phase)
         self.odrv.axis0.controller.input_pos = setpoint
         time.sleep(0.01)
-        if self.odrv.axis0.disarm_reason != 0:
-            print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
-            raise KeyboardInterrupt
+        
+        self.disarm_interrupt()
 
     def move_like_a_watch(self):
         ''' 
@@ -49,9 +58,7 @@ class position_movements:
             self.odrv.axis0.controller.input_pos = i/60
             time.sleep(1)
 
-            if self.odrv.axis0.disarm_reason != 0:
-                print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
-                raise KeyboardInterrupt
+            self.disarm_interrupt()
         
 class velocity_movements:
 
@@ -63,6 +70,14 @@ class velocity_movements:
         Set the control mode.
         '''
         self.odrv.axis0.controller.config.control_mode = mode
+
+    def disarm_interrupt(self):
+        '''
+        chechks if the motor is disarmed , prints the reason and raises a KeyboardInterrupt
+        '''
+        if self.odrv.axis0.disarm_reason != 0:
+            print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
+            raise KeyboardInterrupt
 
     def vel_stop(self):
         ''' 
@@ -76,6 +91,8 @@ class velocity_movements:
         '''
         self._set_ctrl_mode()
         self.odrv.axis0.controller.input_vel = velocity
+
+        self.disarm_interrupt()
 
     def control_by_input(self):
         """
@@ -103,10 +120,7 @@ class velocity_movements:
                 elif event.key == keyboard.Key.space:
                     self.odrv.axis0.controller.input_vel = 0
 
-
-                elif self.odrv.axis0.disarm_reason != 0:
-                    print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
-                    raise KeyboardInterrupt
+                self.disarm_interrupt()
                 
 
     def move_back_and_forth(self, duration:float , velocity: float = 1):
