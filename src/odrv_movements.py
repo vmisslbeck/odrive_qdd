@@ -90,11 +90,24 @@ class velocity_movements:
                 
                 event = events.get(1e6)
                 if event.key == keyboard.KeyCode.from_char('q'):
+                    print("input over.")
                     break
+                elif event.key == keyboard.Key.esc:
+                    print("input over.")
+                    break
+                
                 elif event.key == keyboard.Key.up:
-                    self.odrv.axis0.controller.input_vel += 1
+                    self.odrv.axis0.controller.input_vel += 0.1
                 elif event.key == keyboard.Key.down:
-                    self.odrv.axis0.controller.input_vel -= 1
+                    self.odrv.axis0.controller.input_vel -= 0.1
+                elif event.key == keyboard.Key.space:
+                    self.odrv.axis0.controller.input_vel = 0
+
+
+                elif self.odrv.axis0.disarm_reason != 0:
+                    print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
+                    raise KeyboardInterrupt
+                
 
     def move_back_and_forth(self, duration:float , velocity: float = 1):
         ''' 
@@ -102,6 +115,7 @@ class velocity_movements:
         '''
 
         self._set_ctrl_mode()
+
         self.odrv.axis0.controller.input_vel = velocity
         time.sleep(duration/2)
         self.odrv.axis0.controller.input_vel = -velocity
