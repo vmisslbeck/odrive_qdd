@@ -1,0 +1,28 @@
+Program: JMC Servo Control with Arduino
+
+Description:
+This program allows you to control a JMC Servo motor using an Arduino board. 
+It is compatible with various Arduino models such as Arduino Uno, Nano, Leonardo, Mega, and more.
+
+Instructions:
+1. Connect the JMC Servo motor to the Arduino board according to 
+the wiring diagram provided by the manufacturer.
+2. Upload this program to your Arduino board using the Arduino IDE 
+or any other compatible software.
+3. Adjust the necessary parameters in the code, such as the servo pin, 
+minimum and maximum angles, and any other specific settings required 
+by your JMC Servo motor.
+4. Once the program is uploaded and the connections are properly made, 
+power on the Arduino board.
+5. The program will initialize the servo motor and provide control options.
+6. Use the specified input method (e.g., serial monitor, buttons, 
+potentiometer, etc.) to send commands to the servo motor and control its 
+position or movement.
+7. Experiment with different commands and parameters to achieve the desired 
+servo motor behavior.
+
+Note:
+- Make sure to provide sufficient power to the servo motor to avoid unexpected behavior or damage.
+- Refer to the JMC Servo motor datasheet or user manual for detailed specifications and usage instructions.
+
+Happy servo motor control with Arduino!
