@@ -1,1 +1,28 @@
-Reads an analog input and prints the voltage to the Serial Monitor.
+Program Name: JMC Servo Control with Raspberry Pi Pico
+
+Description:
+This program allows you to control a JMC servo motor using a Raspberry Pi Pico microcontroller. 
+The Raspberry Pi Pico communicates with the JMC servo motor via a suitable communication protocol (e.g., UART, I2C, SPI). 
+The program provides a user-friendly interface to send commands and control the servo motor's position, speed, and other parameters.
+
+Features:
+- Establishes communication between Raspberry Pi Pico and JMC servo motor
+- Sends commands to control the servo motor's position, speed, and other parameters
+- Provides a user-friendly interface for easy control and configuration
+- Supports various communication protocols (e.g., UART, I2C, SPI)
+- Allows for precise and accurate servo motor control
+
+Usage:
+1. Connect the Raspberry Pi Pico to the JMC servo motor according to the specified communication protocol.
+2. Upload this program to the Raspberry Pi Pico.
+3. Use the provided interface to send commands and control the servo motor.
+
+Requirements:
+- Raspberry Pi Pico microcontroller
+- JMC servo motor
+- Suitable communication protocol (e.g., UART, I2C, SPI)
+- Wiring connections between Raspberry Pi Pico and JMC servo motor
+
+Note:
+Please refer to the documentation of your specific JMC servo motor and Raspberry Pi Pico for 
+detailed instructions on wiring connections and communication protocol configuration.
