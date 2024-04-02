@@ -3,6 +3,7 @@ This Program is used to control a JMC Servo Motor with a Raspberry Pi Pico.
 
 @author: Valentin Misslbeck
 @date: 4/2/2024
+MM/DD/YYYY
 */
 
 
@@ -18,6 +19,7 @@ const int button1_pin = 22;
 const int button2_pin = 22; 
 const int voltage_pin = 28; // This has to be one of the analog pins, which are the ADC pins, on the Pico: GP26, GP27, GP28
 
+// speed control variables
 const int multiplier_interval = 4; // Multiplier is necessary for micros() and has to be 4, for millis() it can be 1
 int sensor_value;
 float speed;
@@ -25,6 +27,7 @@ long interval; // Interval in Microseconds // new consideration: const float int
 
 unsigned long previousMicros = 0; // Time at which the last pulse was sent
 
+// state machine variables
 int button1_state = HIGH;
 int last_button1_state = LOW;
 int dir_state = LOW;
@@ -50,7 +53,7 @@ void setup() {
 void loop() {
   // read potentiometer value to control the speed in percent. 4 = 0% and 1023 = 100% of the speed
   sensor_value = analogRead(voltage_pin);
-  Serial.println(sensor_value);
+  // Serial.println(sensor_value); // for debugging purposes
   speed = sensor_value / 10.23;
   interval = multiplier_interval * speed;
 
@@ -73,7 +76,8 @@ void loop() {
     digitalWrite(ledPin, ledState);
   }
 
-  
+  // Implementation of a state machine for the direction of the motor 
+  // (Same could be done for enalbing/disabling the motor)
   button1_state = digitalRead(button1_pin);
 
   if (button1_state == HIGH && last_button1_state == LOW) {
