@@ -1,10 +1,22 @@
-//pin-Belegung
+/*
+This Program is used to control a JMC Servo Motor with a Raspberry Pi Pico. 
+
+@author: Valentin Misslbeck
+@date: 4/2/2024
+*/
+
+
+// Pin Definitions
+
 //-->const int ena_pin = 11;
 const int dir_pin = 2; // Direction Pin
-const int pulse_pin = 3; //eingebauter Digital Pin
-const int button1_pin = 22; // Input Pin für Button1
-const int button2_pin = 22; // Input Pin für Button2 
-const int ledPin = LED_BUILTIN; // if that does not work use "25" // nur optional
+const int pulse_pin = 3; // Pulse Pin
+const int ledPin = LED_BUILTIN; // if that does not work use "25" , only optional
+
+// input pins
+const int button1_pin = 22;
+const int button2_pin = 22; 
+const int voltage_pin = 28; // This has to be one of the analog pins, which are the ADC pins, on the Pico: GP26, GP27, GP28
 
 const int multiplier_interval = 4; // Multiplier ist bei micros() notwendig und muss 4 sein, bei millis() kann es 1 sein
 int sensor_value;
@@ -31,13 +43,13 @@ void setup() {
 
   // initialisiere die Knöpfe-Pins als Input:
   pinMode(button1_pin, INPUT);
-  pinMode(button2_pin, INPUT);
+  pinMode(button2_pin, INPUT); // still unused
   Serial.begin(9600);
 }
 
 void loop() {
   // Lese Potentiometerwert ein um Prozentual die Geschwindigkeit zu steuern. 4 = 0% und 1023 = 100% der Geschwindigkeit
-  sensor_value = analogRead(28);
+  sensor_value = analogRead(voltage_pin);
   Serial.println(sensor_value);
   speed = sensor_value / 10.23; // Geschwindigkeit in Prozent
   interval = multiplier_interval * speed; // Intervall in Microsekunden
