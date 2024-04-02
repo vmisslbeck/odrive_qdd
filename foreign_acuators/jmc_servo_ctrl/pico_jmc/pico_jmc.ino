@@ -1,13 +1,15 @@
 //pin-Belegung
-  //-->const int ena_pin = 11;
+//-->const int ena_pin = 11;
 const int dir_pin = 2; // Direction Pin
 const int pulse_pin = 3; //eingebauter Digital Pin
-const int button1_pin = 11; // Input Pin für Button1
-const int button2_pin = 10; // Input Pin für Button2 
+const int button1_pin = 22; // Input Pin für Button1
+const int button2_pin = 22; // Input Pin für Button2 
 const int ledPin = LED_BUILTIN; // if that does not work use "25" // nur optional
 
 const int multiplier_interval = 4; // Multiplier ist bei micros() notwendig und muss 4 sein, bei millis() kann es 1 sein
-const long interval = multiplier_interval * 10000; // Intervall in Microsekunden // neue Überlegung const float Intervall/4
+int sensor_value;
+float speed;
+long interval; //= multiplier_interval * speed; // Intervall in Microsekunden // neue Überlegung const float Intervall/4
 
 unsigned long previousMicros = 0; // Speicher für den letzten Wechsel
 
@@ -30,12 +32,19 @@ void setup() {
   // initialisiere die Knöpfe-Pins als Input:
   pinMode(button1_pin, INPUT);
   pinMode(button2_pin, INPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
+  // Lese Potentiometerwert ein um Prozentual die Geschwindigkeit zu steuern. 4 = 0% und 1023 = 100% der Geschwindigkeit
+  sensor_value = analogRead(28);
+  Serial.println(sensor_value);
+  speed = sensor_value / 10.23; // Geschwindigkeit in Prozent
+  interval = multiplier_interval * speed; // Intervall in Microsekunden
+
   // Erzeugung eines Pulssignal für Drehung des Motors:
   unsigned long currentMicros = micros();
-  
+
   if (currentMicros - previousMicros >= interval) {
     // Wenn das Intervall vergangen ist
     previousMicros = currentMicros;
@@ -58,6 +67,7 @@ void loop() {
   if (button1_state == HIGH && last_button1_state == LOW) {
     // Knopf wurde gedrückt, aber nicht im vorherigen Schleifendurchlauf
     button_pressed = !button_pressed; // Invertiere den Status der Knopfdrückung
+    Serial.println("direction changed");
   }
 
   last_button1_state = button1_state; // Aktualisiere den letzten Zustand des Knopfs
