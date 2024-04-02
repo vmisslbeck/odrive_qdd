@@ -25,12 +25,12 @@ time.sleep(1)
 move = mvmts.position_movements(my_drive)
 vel_move = mvmts.velocity_movements(my_drive)
 
-# A sine wave to test
+
 t0 = time.monotonic()
 try:
-    vel_move.move_back_and_forth(10, 10)
+    vel_move.control_by_input()
     while True:
-
+        # A sine wave to test
         move.sine_wave(t0)
 
 except KeyboardInterrupt:
