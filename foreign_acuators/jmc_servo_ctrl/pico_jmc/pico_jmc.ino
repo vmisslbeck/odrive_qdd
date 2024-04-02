@@ -8,7 +8,7 @@ This Program is used to control a JMC Servo Motor with a Raspberry Pi Pico.
 
 // Pin Definitions
 
-//-->const int ena_pin = 11;
+// output pins
 const int dir_pin = 2; // Direction Pin
 const int pulse_pin = 3; // Pulse Pin
 const int ledPin = LED_BUILTIN; // if that does not work use "25" , only optional
@@ -18,76 +18,76 @@ const int button1_pin = 22;
 const int button2_pin = 22; 
 const int voltage_pin = 28; // This has to be one of the analog pins, which are the ADC pins, on the Pico: GP26, GP27, GP28
 
-const int multiplier_interval = 4; // Multiplier ist bei micros() notwendig und muss 4 sein, bei millis() kann es 1 sein
+const int multiplier_interval = 4; // Multiplier is necessary for micros() and has to be 4, for millis() it can be 1
 int sensor_value;
 float speed;
-long interval; //= multiplier_interval * speed; // Intervall in Microsekunden // neue Überlegung const float Intervall/4
+long interval; // Interval in Microseconds // new consideration: const float interval/4
 
-unsigned long previousMicros = 0; // Speicher für den letzten Wechsel
+unsigned long previousMicros = 0; // Time at which the last pulse was sent
 
 int button1_state = HIGH;
-int last_button1_state = LOW; // Zustand des vorherigen Schleifendurchlaufs
+int last_button1_state = LOW;
 int dir_state = LOW;
-  //-->int ena_state = HIGH;
 int pulse_state = LOW;
-int ledState = LOW; // nur optional
+int ledState = LOW;
 
-bool button_pressed = false; // Variable zur Verfolgung, ob der Knopf gedrückt wurde
+bool button1_pressed = false;
 
 
 void setup() {
 
   pinMode(dir_pin, OUTPUT);
   pinMode(pulse_pin, OUTPUT);
-  pinMode(ledPin, OUTPUT); // nur optional
+  pinMode(ledPin, OUTPUT);
 
-  // initialisiere die Knöpfe-Pins als Input:
   pinMode(button1_pin, INPUT);
   pinMode(button2_pin, INPUT); // still unused
+  pinMode(voltage_pin, INPUT); // rather unnecessary, but for the sake of completeness
+
   Serial.begin(9600);
 }
 
 void loop() {
-  // Lese Potentiometerwert ein um Prozentual die Geschwindigkeit zu steuern. 4 = 0% und 1023 = 100% der Geschwindigkeit
+  // read potentiometer value to control the speed in percent. 4 = 0% and 1023 = 100% of the speed
   sensor_value = analogRead(voltage_pin);
   Serial.println(sensor_value);
-  speed = sensor_value / 10.23; // Geschwindigkeit in Prozent
-  interval = multiplier_interval * speed; // Intervall in Microsekunden
+  speed = sensor_value / 10.23;
+  interval = multiplier_interval * speed;
 
-  // Erzeugung eines Pulssignal für Drehung des Motors:
+  // producing a pulse signal for rotation of the motor:
   unsigned long currentMicros = micros();
 
   if (currentMicros - previousMicros >= interval) {
-    // Wenn das Intervall vergangen ist
+
     previousMicros = currentMicros;
 
-    // Wenn der Pin HIGH ist, setze ihn auf LOW und umgekehrt
+    // If the pin is HIGH, set it to LOW and vice versa
     if (pulse_state == HIGH) {
-      ledState = LOW; // nur optional
+      ledState = LOW;
       pulse_state = LOW;
     } else {
-      ledState = HIGH; // nur optional
+      ledState = HIGH;
       pulse_state = HIGH;
     }
     digitalWrite(pulse_pin, pulse_state);
-    digitalWrite(ledPin, ledState); // nur optional
+    digitalWrite(ledPin, ledState);
   }
 
-  //
+  
   button1_state = digitalRead(button1_pin);
 
   if (button1_state == HIGH && last_button1_state == LOW) {
-    // Knopf wurde gedrückt, aber nicht im vorherigen Schleifendurchlauf
-    button_pressed = !button_pressed; // Invertiere den Status der Knopfdrückung
+    // buttton was pressed, but not in the previous loop
+    button1_pressed = !button1_pressed;
     Serial.println("direction changed");
   }
 
-  last_button1_state = button1_state; // Aktualisiere den letzten Zustand des Knopfs
+  last_button1_state = button1_state; // update last button state
 
-  if (button_pressed) {
-    dir_state = HIGH; // Setze Richtung auf HIGH, wenn der Knopf gedrückt wurde
+  if (button1_pressed) {
+    dir_state = HIGH; // Set direction to HIGH if the button was pressed
   } else {
-    dir_state = LOW; // Andernfalls bleibt die Richtung auf LOW
+    dir_state = LOW; // Otherwise the direction stays LOW
   }
 
   digitalWrite(dir_pin, dir_state);
