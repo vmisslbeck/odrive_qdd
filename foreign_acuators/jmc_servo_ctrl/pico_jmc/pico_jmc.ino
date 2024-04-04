@@ -55,8 +55,16 @@ void loop() {
   // that means, that a low value of the potentiometer means a low interval and thus a high speed
   sensor_value = analogRead(voltage_pin);
   //Serial.println(sensor_value);
-  speed = (1023/sensor_value); // (1023 / 1023)^2 = 1 , (1023 / 5)^2 = 41861
-  interval = multiplier_interval * speed; // 4 * 0.9961 = 3.9844 , 4 * 0 = 0
+  speed = (1023/sensor_value); // (1023 / 1023) = 1 , (1023 / 4 ) = 255
+  if speed < 10 {
+    // then the motor stops
+    interval = 0;
+  }
+  else {
+    interval = (speed * multiplier_interval);
+  };
+  
+  // 4 * 0.9961 = 3.9844 , 4 * 0 = 0
   //Serial.println(interval);
 
   // producing a pulse signal for rotation of the motor:
