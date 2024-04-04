@@ -51,11 +51,13 @@ void setup() {
 }
 
 void loop() {
-  // read potentiometer value to control the speed in percent. 4 = 0% and 1023 = 100% of the speed
+  // read potentiometer value to control the speed in percent. 4 = 100 %  and 1023 = 0%
+  // that means, that a low value of the potentiometer means a low interval and thus a high speed
   sensor_value = analogRead(voltage_pin);
-  // Serial.println(sensor_value); // for debugging purposes
-  speed = sensor_value / 10.23;
-  interval = multiplier_interval * speed;
+  //Serial.println(sensor_value);
+  speed = (1023/sensor_value); // (1023 / 1023)^2 = 1 , (1023 / 5)^2 = 41861
+  interval = multiplier_interval * speed; // 4 * 0.9961 = 3.9844 , 4 * 0 = 0
+  //Serial.println(interval);
 
   // producing a pulse signal for rotation of the motor:
   unsigned long currentMicros = micros();
@@ -96,6 +98,3 @@ void loop() {
 
   digitalWrite(dir_pin, dir_state);
 }
-  
-  
-  
