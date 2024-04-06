@@ -6,6 +6,9 @@ This Program is used to control a JMC Servo Motor with a Raspberry Pi Pico.
 MM/DD/YYYY
 */
 
+#include <iostream>
+#include <fstream>
+#include <string>
 
 // Pin Definitions
 
@@ -48,6 +51,16 @@ void setup() {
   pinMode(voltage_pin, INPUT); // rather unnecessary, but for the sake of completeness
 
   Serial.begin(9600);
+
+  std::ifstream infile("intgr_param.txt");
+  std::string line;
+
+  int parameterIndex = 1;
+  while (std::getline(infile, line)) {
+    std::cout << "Parameter" << parameterIndex << ": " << line << std::endl;
+    Serial.println("Parameter" + parameterIndex + ": " + line);
+    parameterIndex++;
+  }
 }
 
 void loop() {
@@ -56,7 +69,7 @@ void loop() {
   sensor_value = analogRead(voltage_pin);
   //Serial.println(sensor_value);
   speed = (1023/sensor_value); // (1023 / 1023) = 1 , (1023 / 4 ) = 255
-  if speed < 10 {
+  if (speed < 10) {
     // then the motor stops
     interval = 0;
   }
