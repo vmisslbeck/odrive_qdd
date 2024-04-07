@@ -8,8 +8,9 @@ import math
 
 class position_movements:
     ''' for the movements class, the odrive has to be '''
-    def __init__(self, odrv):
+    def __init__(self, odrv, gear_ratio_xto1: float = 1):
         self.odrv = odrv
+        self.gear_ratio_xto1 = gear_ratio_xto1
 
     def _set_ctrl_mode(self, mode: ControlMode = ControlMode.POSITION_CONTROL):
         ''' 
@@ -27,10 +28,25 @@ class position_movements:
 
     def move_to_position(self, position: float):
         ''' 
-        Move to a specific position.
+        Move to a specific position. Note that position can go from -inf to +inf. That is not the same as angle.
         '''
         self._set_ctrl_mode()
         self.odrv.axis0.controller.input_pos = position
+
+        self.disarm_interrupt()
+
+    def move_to_angle(self, angle: float):
+        ''' 
+        Move to a specific angle. Note that angle can go from 0 to 360 degrees.
+        For example, if the motor is in encoder position 5000 and you want to move to angle 0, the motor won't move t0 encoder position 0, 
+        but the nearest encoder position to angle 0.
+        '''
+        self._set_ctrl_mode()
+        pos = float(self.odrv.axis0.controller.pos_setpoint)
+        pos += angle * 8192 / 360
+        #what is the 8192? it is the number of encoder counts per revolution
+        #how do we know that? we can check it in the odrivetool by typing odrv0.axis0.encoder.config
+        print(self.odrv.axis0.encoder.config) # test this!!!!
 
         self.disarm_interrupt()
 
