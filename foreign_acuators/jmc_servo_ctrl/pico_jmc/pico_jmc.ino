@@ -58,9 +58,11 @@ void setup() {
   int parameterIndex = 1;
   while (std::getline(infile, line)) {
     std::cout << "Parameter" << parameterIndex << ": " << line << std::endl;
-    Serial.println("Parameter" + parameterIndex + ": " + line);
+    Serial.print("Parameter");
     parameterIndex++;
   }
+  infile.close(); //check if necessary
+  // read in the parameters from the file -> if line 1 == ON && line 2 == OFF && line 3 == ON && line 4 == OFF, 
 }
 
 void loop() {
@@ -69,9 +71,13 @@ void loop() {
   sensor_value = analogRead(voltage_pin);
   //Serial.println(sensor_value);
   speed = (1023/sensor_value); // (1023 / 1023) = 1 , (1023 / 4 ) = 255
-  if (speed < 10) {
+  if (sensor_value < 6) {
     // then the motor stops
     interval = 0;
+  }
+  else if (sensor_value >= 255)
+  {
+    interval = 10;
   }
   else {
     interval = (speed * multiplier_interval);
@@ -88,13 +94,14 @@ void loop() {
     previousMicros = currentMicros;
 
     // If the pin is HIGH, set it to LOW and vice versa
+    if (interval != 0) {
     if (pulse_state == HIGH) {
       ledState = LOW;
       pulse_state = LOW;
     } else {
       ledState = HIGH;
       pulse_state = HIGH;
-    }
+    }}
     digitalWrite(pulse_pin, pulse_state);
     digitalWrite(ledPin, ledState);
   }
