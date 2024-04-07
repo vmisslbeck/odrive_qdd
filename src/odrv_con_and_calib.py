@@ -64,3 +64,12 @@ def check_voltage(odrv, voltage:float =20.0):
         while odrv.vbus_voltage < voltage:
             time.sleep(2)
             print("...")
+
+def check_errors(odrv, want_to_clear_errors: bool = False):
+    ''' 
+    Check if there are errors on the ODrive and clear them if necessary.
+    Input arguments look like this: my_drive (odrive object), want_to_clear_errors (bool)
+    '''
+    odrv.utils.dump_errors(odrv, want_to_clear_errors)
+    print(odrv.utils.dump_errors(odrv))
+    
