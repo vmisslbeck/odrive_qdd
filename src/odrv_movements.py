@@ -43,7 +43,8 @@ class position_movements:
         '''
         self._set_ctrl_mode()
         pos = float(self.odrv.axis0.controller.pos_setpoint)
-        pos += angle * 8192 / 360
+        pos += angle * 8192 / 360 * self.gear_ratio_xto1
+        self.odrv.axis0.controller.input_pos = pos
         #what is the 8192? it is the number of encoder counts per revolution
         #how do we know that? we can check it in the odrivetool by typing odrv0.axis0.encoder.config
         print(self.odrv.axis0.encoder.config) # test this!!!!
