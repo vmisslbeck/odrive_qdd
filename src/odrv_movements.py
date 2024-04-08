@@ -49,6 +49,8 @@ class position_movements:
 
         if self.circular_sector[0] <= relative_set_pos*360 <= self.circular_sector[1]: #
             return set_position
+        elif self.circular_sector[0] >= relative_set_pos*360:
+            return absolute_set_pos + (self.circular_sector[0]/360)
         else:
             return self.odrv.axis0.encoder.pos_estimates
         
