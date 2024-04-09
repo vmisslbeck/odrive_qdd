@@ -19,11 +19,12 @@ class position_movements:
         self.gear_ratio_xto1 = gear_ratio_xto1
         self.circular_sector = circular_sector
 
-    def _set_ctrl_mode(self, mode: ControlMode = ControlMode.POSITION_CONTROL):
+    def _set_ctrl_mode(self, mode: ControlMode = ControlMode.POSITION_CONTROL, input_mode: InputMode = InputMode.PASSTHROUGH):
         ''' 
         Set the control mode. Mandatory for every movement method.
         '''
         self.odrv.axis0.controller.config.control_mode = mode
+        self.odrv.axis0.controller.config.input_mode = input_mode
 
     def disarm_interrupt(self):
         '''
@@ -36,6 +37,7 @@ class position_movements:
     def dead_zone_guard(self, set_position: float):
         ''' 
         Guard the dead zone. The dead zone is the sector where the motor should not move.
+        The odrive python api has hidden a absolute and relative position under odrv0.axis0.commutation_mapper.
         '''
         if self.circular_sector == [0, 360]:
             pass
@@ -119,11 +121,12 @@ class velocity_movements:
     def __init__(self, odrv):
         self.odrv = odrv
 
-    def _set_ctrl_mode(self, mode: ControlMode = ControlMode.VELOCITY_CONTROL):
+    def _set_ctrl_mode(self, mode: ControlMode = ControlMode.VELOCITY_CONTROL, input_mode: InputMode = InputMode.PASSTHROUGH):
         ''' 
         Set the control mode.
         '''
         self.odrv.axis0.controller.config.control_mode = mode
+        self.odrv.axis0.controller.config.input_mode = input_mode
 
     def disarm_interrupt(self):
         '''
@@ -160,16 +163,13 @@ class velocity_movements:
         # Block for as much as possible
                 
                 event = events.get(1e6)
-                if event.key == keyboard.KeyCode.from_char('q'):
-                    print("input over.")
-                    break
-                elif event.key == keyboard.Key.esc:
+                if event.key == keyboard.KeyCode.from_char('q') or event.key == keyboard.Key.esc:
                     print("input over.")
                     break
                 
-                elif event.key == keyboard.Key.up:
+                elif event.key == keyboard.KeyCode.from_char('w'):
                     self.odrv.axis0.controller.input_vel += 0.1
-                elif event.key == keyboard.Key.down:
+                elif event.key == keyboard.KeyCode.from_char('s'):
                     self.odrv.axis0.controller.input_vel -= 0.1
                 elif event.key == keyboard.Key.space:
                     self.odrv.axis0.controller.input_vel = 0
