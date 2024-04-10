@@ -5,8 +5,29 @@ import time
 from pynput import keyboard
 import math
 
+class BaseMovements:
+    def __init__(self, odrv):
+        self.odrv = odrv
 
-class position_movements:
+    def _set_ctrl_mode(self, mode: ControlMode, input_mode: InputMode = InputMode.PASSTHROUGH):
+        ''' 
+        Set the control mode.
+        '''
+        self.odrv.axis0.controller.config.control_mode = mode
+        self.odrv.axis0.controller.config.input_mode = input_mode
+
+    def disarm_interrupt(self):
+        '''
+        checks if the motor is disarmed , prints the reason and raises a custom exception
+        '''
+        if self.odrv.axis0.disarm_reason != 0:
+            print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
+            raise KeyboardInterrupt
+        if self.odrv.axis0.disarm_reason != 0:
+            raise MotorDisarmedException("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
+
+
+class position_movements(BaseMovements):
     ''' for the movements class, the odrive has to be '''
     def __init__(self, odrv, gear_ratio_xto1: float = 1, circular_sector: list = [0, 360]):
         '''
@@ -25,14 +46,6 @@ class position_movements:
         '''
         self.odrv.axis0.controller.config.control_mode = mode
         self.odrv.axis0.controller.config.input_mode = input_mode
-
-    def disarm_interrupt(self):
-        '''
-        checks if the motor is disarmed , prints the reason and raises a KeyboardInterrupt
-        '''
-        if self.odrv.axis0.disarm_reason != 0:
-            print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
-            raise KeyboardInterrupt
         
     def dead_zone_guard(self, set_position: float):
         ''' 
@@ -87,23 +100,20 @@ class position_movements:
         '''
         self._set_ctrl_mode()
         pos = float(self.odrv.axis0.controller.pos_setpoint)
-        # pos += angle * 8192 / 360 * self.gear_ratio_xto1
         pos += angle /360 * self.gear_ratio_xto1
         self.odrv.axis0.controller.input_pos = pos
-        #what is the 8192? it is the number of encoder counts per revolution
-        #how do we know that? we can check it in the odrivetool by typing odrv0.axis0.encoder.config
         print(self.odrv.axis0.encoder.config) # test this!!!!
 
         self.disarm_interrupt()
 
-    def sine_wave(self, t0: float, SINE_PERIOD: float = 2):
+    def sine_wave(self, t0: float, sine_period: float = 2):
         ''' 
         A sine wave to eternity.
         the smaller the value of SINE_PERIOD, the faster the motor will spin
         '''
         self._set_ctrl_mode()
         t = time.monotonic() - t0
-        phase = t * (2 * math.pi / SINE_PERIOD)
+        phase = t * (2 * math.pi / sine_period)
         setpoint = math.sin(phase)
         self.odrv.axis0.controller.input_pos = setpoint
         time.sleep(0.01)
@@ -121,7 +131,7 @@ class position_movements:
 
             self.disarm_interrupt()
         
-class velocity_movements:
+class velocity_movements(BaseMovements):
 
     def __init__(self, odrv):
         self.odrv = odrv
@@ -132,14 +142,6 @@ class velocity_movements:
         '''
         self.odrv.axis0.controller.config.control_mode = mode
         self.odrv.axis0.controller.config.input_mode = input_mode
-
-    def disarm_interrupt(self):
-        '''
-        chechks if the motor is disarmed , prints the reason and raises a KeyboardInterrupt
-        '''
-        if self.odrv.axis0.disarm_reason != 0:
-            print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
-            raise KeyboardInterrupt
 
     def vel_stop(self):
         ''' 
