@@ -26,7 +26,7 @@ class BaseMovements:
             print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
             raise KeyboardInterrupt
         if self.odrv.axis0.disarm_reason != 0:
-            raise MotorDisarmedException("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
+            raise MotorDisarmedException(str(self.odrv.axis0.disarm_reason))
 
 
 class position_movements(BaseMovements):
@@ -191,3 +191,10 @@ class velocity_movements(BaseMovements):
         self.odrv.axis0.controller.input_vel = -velocity
         time.sleep(duration/2)
         self.odrv.axis0.controller.input_vel = 0
+
+
+class MotorDisarmedException(Exception):
+    '''class for custom exception for motor controller'''
+    def __init__(self, message):
+        self.reason = message
+        super().__init__(f"Motor disarmed. Reason: {self.reason}")
