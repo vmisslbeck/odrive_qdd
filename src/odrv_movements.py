@@ -6,6 +6,8 @@ from pynput import keyboard
 import math
 
 class BaseMovements:
+    ''' The BaseMovements class is the parent class of the PositionMovements and VelocityMovements classes. It contains
+    methods that are common to both classes.'''
     def __init__(self, odrv):
         self.odrv = odrv
 
@@ -28,7 +30,9 @@ class BaseMovements:
 
 
 class position_movements(BaseMovements):
-    ''' for the movements class, the odrive has to be '''
+    ''' the PositionMovements class is a subclass of the BaseMovements class. It handles
+    all movements that are related to position control. typical Robot movements are position controlled.'''
+
     def __init__(self, odrv, gear_ratio_xto1: float = 1, circular_sector: list = [0, 360]):
         '''
         about circular_sector: if your motor should only move in a certain sector, you can define it here.
@@ -126,16 +130,13 @@ class position_movements(BaseMovements):
             self.disarm_interrupt()
         
 class velocity_movements(BaseMovements):
+    ''' the VelocityMovements class is a subclass of the BaseMovements class. It handles 
+    all movements that are related to velocity control. a typical example is a conveyor belt. or 
+    a drone motor.'''
 
     def __init__(self, odrv):
         self.odrv = odrv
-
-    def _set_ctrl_mode(self, mode: ControlMode = ControlMode.VELOCITY_CONTROL, input_mode: InputMode = InputMode.PASSTHROUGH):
-        ''' 
-        Set the control mode.
-        '''
-        self.odrv.axis0.controller.config.control_mode = mode
-        self.odrv.axis0.controller.config.input_mode = input_mode
+        self.controlMode = ControlMode.VELOCITY_CONTROL
 
     def vel_stop(self):
         ''' 
@@ -147,7 +148,7 @@ class velocity_movements(BaseMovements):
         ''' 
         velocity controlled movement. use this method to move the motor with a specific velocity.
         '''
-        self._set_ctrl_mode()
+        self._set_ctrl_mode(self.controlMode)
         self.odrv.axis0.controller.input_vel = velocity
 
         self.disarm_interrupt()
@@ -157,7 +158,7 @@ class velocity_movements(BaseMovements):
         With this method you can control the odrive with your arrow keys.
         Press arrow_up to increase velocity, arrow_down to decrease velocity.
         """
-        self._set_ctrl_mode()
+        self._set_ctrl_mode(self.controlMode)
         print("Press arrow_up to increase velocity, arrow_down to decrease velocity, q to quit: ")
         while True:
             with keyboard.Events() as events:
@@ -183,7 +184,7 @@ class velocity_movements(BaseMovements):
         Move back and forth.
         '''
 
-        self._set_ctrl_mode()
+        self._set_ctrl_mode(self.controlMode)
 
         self.odrv.axis0.controller.input_vel = velocity
         time.sleep(duration/2)
