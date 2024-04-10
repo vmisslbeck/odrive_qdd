@@ -41,26 +41,25 @@ class position_movements:
         '''
         if self.circular_sector == [0, 360]:
             pass
-
-        
-        absolute_is_pos = self.odrv.axis.pos_estimate #absolute_is_pos = float(self.odrv.axis0.controller.pos_setpoint)
-        relative_is_pos = self.odrv.axis0.commutation_mapper.pos_abs #relative_is_pos = absolute_is_pos % 1
-        # Note, that the relative_is_pos is relaltive to one turn, you could say, if you multiply it by 360 it is an angle
-        # but the odrive commutation_mapper absolute position (from above) is the same as described here. But the odrive
-        # commutation_mapper relative position is realtive to the encoder postion at startup. So if the motor is turned 90 
-        # degrees since startup (motor turned a quarter circle) then commutation_mapper.pos_rel would be about 0.25
-
-        absolute_set_pos = set_position
-        relative_set_pos = absolute_set_pos % 1
-
-        delta_pos = absolute_set_pos - absolute_is_pos
-
-        if self.circular_sector[0] <= relative_set_pos*360 <= self.circular_sector[1]: #
-            return set_position
-        elif self.circular_sector[0] >= relative_set_pos*360:
-            return absolute_set_pos + (self.circular_sector[0]/360)
         else:
-            return self.odrv.axis0.encoder.pos_estimates
+            absolute_is_pos = self.odrv.axis.pos_estimate #absolute_is_pos = float(self.odrv.axis0.controller.pos_setpoint)
+            relative_is_pos = self.odrv.axis0.commutation_mapper.pos_abs
+            # Note, that the relative_is_pos is relaltive to one turn, you could say, if you multiply it by 360 it is an angle
+            # but the odrive commutation_mapper absolute position (from above) is the same as described here. But the odrive
+            # commutation_mapper relative position is realtive to the encoder postion at startup. So if the motor is turned 90 
+            # degrees since startup (motor turned a quarter circle) then commutation_mapper.pos_rel would be about 0.25
+
+            absolute_set_pos = set_position
+            relative_set_pos = absolute_set_pos % 1
+
+            if self.circular_sector[0] <= relative_set_pos*360 <= self.circular_sector[1]: #
+                return set_position
+            elif self.circular_sector[0] >= relative_set_pos*360:
+                return int(absolute_is_pos) + (self.circular_sector[0]/360)
+            elif self.circular_sector[1] <= relative_set_pos*360:
+                return int(absolute_is_pos) + (self.circular_sector[1]/360)
+            else:
+                return self.odrv.axis0.encoder.pos_estimates
         
     def move_to_zero(self):
         ''' 
