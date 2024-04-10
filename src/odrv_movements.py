@@ -39,13 +39,7 @@ class position_movements(BaseMovements):
         self.odrv = odrv
         self.gear_ratio_xto1 = gear_ratio_xto1
         self.circular_sector = circular_sector
-
-    def _set_ctrl_mode(self, mode: ControlMode = ControlMode.POSITION_CONTROL, input_mode: InputMode = InputMode.PASSTHROUGH):
-        ''' 
-        Set the control mode. Mandatory for every movement method.
-        '''
-        self.odrv.axis0.controller.config.control_mode = mode
-        self.odrv.axis0.controller.config.input_mode = input_mode
+        self.controlMode = ControlMode.POSITION_CONTROL
         
     def dead_zone_guard(self, set_position: float):
         ''' 
@@ -78,7 +72,7 @@ class position_movements(BaseMovements):
         ''' 
         Move to encoder position 0.
         '''
-        self._set_ctrl_mode()
+        self._set_ctrl_mode(self.controlMode)
         self.odrv.axis0.controller.input_pos = 0
 
         self.disarm_interrupt()
@@ -87,7 +81,7 @@ class position_movements(BaseMovements):
         ''' 
         Move to a specific position. Note that position can go from -inf to +inf. That is not the same as angle.
         '''
-        self._set_ctrl_mode()
+        self._set_ctrl_mode(self.controlMode)
         self.odrv.axis0.controller.input_pos = position
 
         self.disarm_interrupt()
@@ -98,7 +92,7 @@ class position_movements(BaseMovements):
         For example, if the motor is in encoder position 5000 and you want to move to angle 0, 
         the motor won't move to encoder position 0, but the nearest encoder position to angle 0.
         '''
-        self._set_ctrl_mode()
+        self._set_ctrl_mode(self.controlMode)
         pos = float(self.odrv.axis0.controller.pos_setpoint)
         pos += angle /360 * self.gear_ratio_xto1
         self.odrv.axis0.controller.input_pos = pos
@@ -111,7 +105,7 @@ class position_movements(BaseMovements):
         A sine wave to eternity.
         the smaller the value of SINE_PERIOD, the faster the motor will spin
         '''
-        self._set_ctrl_mode()
+        self._set_ctrl_mode(self.controlMode)
         t = time.monotonic() - t0
         phase = t * (2 * math.pi / sine_period)
         setpoint = math.sin(phase)
@@ -124,7 +118,7 @@ class position_movements(BaseMovements):
         ''' 
         Move the motor like a watch.
         '''
-        self._set_ctrl_mode()
+        self._set_ctrl_mode(self.controlMode)
         for i in range(60):
             self.odrv.axis0.controller.input_pos = i/60
             time.sleep(1)
