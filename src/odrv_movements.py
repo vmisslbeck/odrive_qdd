@@ -21,10 +21,8 @@ class BaseMovements:
     def disarm_interrupt(self):
         '''
         checks if the motor is disarmed , prints the reason and raises a custom exception
+        Look up Error codes here: https://docs.odriverobotics.com/v/latest/fibre_types/com_odriverobotics_ODrive.html#ODrive.Error
         '''
-        if self.odrv.axis0.disarm_reason != 0:
-            print("Motor disarmed. Reason: " + str(self.odrv.axis0.disarm_reason))
-            raise KeyboardInterrupt
         if self.odrv.axis0.disarm_reason != 0:
             raise MotorDisarmedException(str(self.odrv.axis0.disarm_reason))
 
@@ -159,7 +157,7 @@ class velocity_movements(BaseMovements):
         Press arrow_up to increase velocity, arrow_down to decrease velocity.
         """
         self._set_ctrl_mode(self.controlMode)
-        print("Press arrow_up to increase velocity, arrow_down to decrease velocity, q to quit: ")
+        print("Press 'W' to increase velocity, 'S' to decrease velocity, q to quit: ")
         while True:
             with keyboard.Events() as events:
         # Block for as much as possible
