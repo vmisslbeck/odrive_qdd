@@ -35,5 +35,5 @@ try:
 
 except KeyboardInterrupt:
     my_drive.axis0.requested_state = AxisState.IDLE
-    print("Motor stopped.")
+    print("Ctrl + C pressed. Motor stopped.")
     pass
