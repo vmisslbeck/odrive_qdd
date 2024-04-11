@@ -25,7 +25,22 @@ class BaseMovements:
         '''
         if self.odrv.axis0.disarm_reason != 0:
             raise MotorDisarmedException(str(self.odrv.axis0.disarm_reason))
+        
+    def get_rel_pos(self):
+        ''' 
+        Get the relative position. Relative position is the position of the motor relative to the encoder position at startup.
+        So if the motor makes 100 and a half turns, the relative position would be 100.5 and if you then turn it 200 truns in 
+        the other direction, the relative position would be -99.5.
+        '''
+        # that method is kinda ugly, because the api is kinda clunky and there are so many
+        # position variable but they all mean something else, for example odrv.axis0.commuation_mapper.pos_rel 
+        # will never be greater than 1 or negative. If it is at 0.99 and you turn the motor 0.02 turns, it will be 0.01
+        # so note, that the returned element could also be 'self.odrv.axis0.encoder.pos_estimate' 
+        # (which you could think from reading the docs but I just can't find it and get errors when using it. 
+        # Even in the odrive GUI inspector it is greyed out.)
 
+        return self.odrv.axis0.pos_vel_mapper.pos_rel
+    
 
 class position_movements(BaseMovements):
     ''' the PositionMovements class is a subclass of the BaseMovements class. It handles
