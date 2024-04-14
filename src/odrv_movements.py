@@ -115,9 +115,11 @@ class position_movements(BaseMovements):
         '''
         self._set_ctrl_mode(self.controlMode)
         pos = float(self.get_rel_pos())
-        angle_in_float = angle/360
-        x = angle_in_float - (pos%1)
-        pos += x
+        is_angle = ((pos % 1) / self.gear_ratio_xto1) * 360
+        angle = angle * self.gear_ratio_xto1
+
+        x = (angle)/360
+        pos = x
         self.odrv.axis0.controller.input_pos = pos
 
         self.disarm_interrupt()
