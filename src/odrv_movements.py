@@ -112,15 +112,13 @@ class position_movements(BaseMovements):
         Move to a specific angle. Note that angle can go from 0 to 360 degrees.
         For example, if the motor is in encoder position 5000 and you want to move to angle 0, 
         the motor won't move to encoder position 0, but the nearest encoder position to angle 0.
+        - Hi valentin here, the last sentence is what we plan, but right now the motor will move to encoder position 0 sry.
         '''
         self._set_ctrl_mode(self.controlMode)
-        pos = float(self.get_rel_pos())
-        is_angle = ((pos % 1) / self.gear_ratio_xto1) * 360
-        angle = angle * self.gear_ratio_xto1
 
+        angle = angle * self.gear_ratio_xto1
         x = (angle)/360
-        pos = x
-        self.odrv.axis0.controller.input_pos = pos
+        self.odrv.axis0.controller.input_pos = x
 
         self.disarm_interrupt()
 
@@ -149,6 +147,7 @@ class position_movements(BaseMovements):
 
             self.disarm_interrupt()
         
+
 class velocity_movements(BaseMovements):
     ''' the VelocityMovements class is a subclass of the BaseMovements class. It handles 
     all movements that are related to velocity control. a typical example is a conveyor belt. or 
