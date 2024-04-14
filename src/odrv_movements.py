@@ -41,6 +41,10 @@ class BaseMovements:
 
         return self.odrv.axis0.pos_vel_mapper.pos_rel
     
+    def get_rel_pos_modulo_one(self):
+        '''Implement! not sure if you should use odrv.axis0.commuation_mapper.pos_rel or pos.abs or something else'''
+        pass
+    
 
 class position_movements(BaseMovements):
     ''' the PositionMovements class is a subclass of the BaseMovements class. It handles
@@ -110,10 +114,11 @@ class position_movements(BaseMovements):
         the motor won't move to encoder position 0, but the nearest encoder position to angle 0.
         '''
         self._set_ctrl_mode(self.controlMode)
-        pos = float(self.odrv.axis0.controller.pos_setpoint)
-        pos += angle /360 * self.gear_ratio_xto1
+        pos = float(self.get_rel_pos())
+        angle_in_float = angle/360
+        x = angle_in_float - (pos%1)
+        pos += x
         self.odrv.axis0.controller.input_pos = pos
-        print(self.odrv.axis0.encoder.config) # test this!!!!
 
         self.disarm_interrupt()
 
