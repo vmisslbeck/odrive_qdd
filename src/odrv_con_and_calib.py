@@ -26,26 +26,47 @@ class Utils:
         self.odrv = odrive.find_any(timeout=15)
         self.odrv_axis = getattr(self.odrv, "axis{}".format(self.axis_num))
 
+    def find_one_odrive(self):
+        ''' 
+        Find a connected ODrive (this will block until you connect one)
+        '''
+        print("finding an odrive...")
+        odrv = odrive.find_any()
+        print("Odrive found!")
+        odrv.clear_errors()
+        time.sleep(0.5)
+        time.sleep(1)
+        odrv.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
+        return odrv
+
+    def find_all_odrives(self):
+        '''
+        if you want to use more than one odrive
+        to use the object, you can do this:
+        my_drive0 = find_all_odrives()[0]
+        '''
+        #print(type(odrive.find_any())) # : <class 'fibre.libfibre.anonymous_interface_2380363422560'>
+
+        # we use find_any because it will start a background thread that handles the backend,
+        # so in the end we can access odrive.connected_devices
+        odrive.find_any()
+        od_list = []
+        for i in range(len(odrive.connected_devices)):
+            odrv = odrive.connected_devices[i]
+            od_list.append(odrv)
+
+        return od_list
+
     def clear_errors(self):
         """
         Clears all errors on the odrive.
         """
         self.odrv.clear_errors()
 
-    def configure_odrive(self):
-        """
-        Configures the odrive for a BLDC motor.
-        """
-        if self.erase_config:
-            # Erase pre-exsisting configuration
-            print("Erasing pre-exsisting configuration...")
-            try:
-                self.odrv.erase_configuration()
-            except Exception:
-                pass
-
-        self._find_odrive()
-
+    def settings(self):
+        '''
+        set the settings like you need it. The predefined settings will most likely not fit exactly for you system.
+        '''
         # Set this to True if using a brake resistor
         self.odrv.config.dc_bus_overvoltage_trip_level = 30
         self.odrv.config.dc_bus_undervoltage_trip_level = 20
@@ -102,17 +123,30 @@ class Utils:
         self.odrv.config.enable_uart_a = False
         # For the BLDC we use the onboard encoder on the back of the odrive.
         self.odrv.axis0.config.load_encoder = EncoderId.ONBOARD_ENCODER0
-        self.odrv.axis0.config.commutation_encoder = EncoderId.ONBOARD_ENCODER0
+        self.odrv.axis0.config.commutation_encoder = EncoderId.ONBOARD_ENCODER0        
+
+
+    def configure_odrive(self):
+        """
+        Configures the odrive for a BLDC motor.
+        """
+        if self.erase_config:
+            # Erase pre-exsisting configuration
+            print("Erasing pre-exsisting configuration...")
+            try:
+                self.odrv.erase_configuration()
+            except Exception:
+                pass
+
+        self._find_odrive()
+
+        self.settings()
 
         # Set in position control mode so we can control the position of the
         # wheel
         self.odrv_axis.controller.config = ControlMode.POSITION_CONTROL
 
-        # In the next step we are going to start powering the motor and so we
-        # want to make sure that some of the above settings that require a
-        # reboot are applied first.
-
-        # Motors must be in IDLE mode before saving
+        # Motor must be in IDLE mode before saving
         self.odrv_axis.requested_state = AxisState.IDLE
         try:
             print("Saving manual configuration and rebooting...")
@@ -279,37 +313,6 @@ class Utils:
         '''
         for i in [1,2,3,4]:
             print('voltage on GPIO{} is {} Volt'.format(i, odrv.get_adc_voltage(i)))
-
-    def find_one_odrive(self):
-        ''' 
-        Find a connected ODrive (this will block until you connect one)
-        '''
-        print("finding an odrive...")
-        odrv = odrive.find_any()
-        print("Odrive found!")
-        odrv.clear_errors()
-        time.sleep(0.5)
-        time.sleep(1)
-        odrv.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
-        return odrv
-
-    def find_all_odrives(self):
-        '''
-        if you want to use more than one odrive
-        to use the object, you can do this:
-        my_drive0 = find_all_odrives()[0]
-        '''
-        #print(type(odrive.find_any())) # : <class 'fibre.libfibre.anonymous_interface_2380363422560'>
-
-        # we use find_any because it will start a background thread that handles the backend,
-        # so in the end we can access odrive.connected_devices
-        odrive.find_any()
-        od_list = []
-        for i in range(len(odrive.connected_devices)):
-            odrv = odrive.connected_devices[i]
-            od_list.append(odrv)
-
-        return od_list
 
     def check_voltage(self, odrv, voltage:float =20.0):
         ''' 
