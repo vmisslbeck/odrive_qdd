@@ -16,14 +16,17 @@ cc.check_voltage(my_drive)
 
 #my_drive.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
 my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
-print("setpoint: " + str(my_drive.axis0.controller.pos_setpoint))
-print("encoder pos: " + str(mvmts.BaseMovements(my_drive).get_rel_pos()))
-
-time.sleep(1)
 
 gear_ratio_x_to1 = 9 # set this to the gear ratio of your motor, if no gear, set it to 1
 move = mvmts.position_movements(my_drive, gear_ratio_x_to1)
 vel_move = mvmts.velocity_movements(my_drive)
+
+
+
+print("setpoint: " + str(my_drive.axis0.controller.pos_setpoint))
+print("encoder pos: " + str(move.get_rel_pos()))
+
+time.sleep(1)
 
 
 t0 = time.monotonic()
