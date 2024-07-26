@@ -4,6 +4,9 @@ from odrive.enums import *
 import time
 from pynput import keyboard
 import math
+import matplotlib.pyplot as plt
+import numpy as np
+import sys
 
 class BaseMovements:
     ''' The BaseMovements class is the parent class of the PositionMovements and VelocityMovements classes. It contains
@@ -38,14 +41,17 @@ class BaseMovements:
         # so note, that the returned element could also be 'self.odrv.axis0.encoder.pos_estimate' 
         # (which you could think from reading the docs but I just can't find it and get errors when using it. 
         # Even in the odrive GUI inspector it is greyed out.)
+        # So the solution to go with, is odrv.axis0.pos_vel_mapper.pos_rel,it returns how many turns the motor has made 
+        # (since startup? - don't pin me down on that).
 
         return self.odrv.axis0.pos_vel_mapper.pos_rel
     
     def get_rel_pos_modulo_one(self):
         '''Implement! not sure if you should use odrv.axis0.commuation_mapper.pos_rel or pos.abs or something else'''
-        pass
+        rel_pos = self.get_rel_pos()
+        return rel_pos % 1
     
-
+    
 class position_movements(BaseMovements):
     ''' the PositionMovements class is a subclass of the BaseMovements class. It handles
     all movements that are related to position control. typical Robot movements are position controlled.'''
@@ -61,6 +67,17 @@ class position_movements(BaseMovements):
         self.gear_ratio_xto1 = gear_ratio_xto1
         self.circular_sector = circular_sector
         self.controlMode = ControlMode.POSITION_CONTROL
+
+    def get_pos_w_gear_ratio(self):
+        ''' 
+        Get the position with gear ratio.
+        '''
+        return self.get_rel_pos() / self.gear_ratio_xto1
+
+    def get_rel_pos_modulo_one(self):
+        ''' Modulo one of the relative position. you will get a percentage value of the turn'''
+        rel_pos = self.get_pos_w_gear_ratio()
+        return rel_pos % 1
         
     def dead_zone_guard(self, set_position: float):
         ''' 
