@@ -6,6 +6,7 @@ import odrv_con_and_calib as concal
 import odrv_movements as mvm
 
 class PlotMe:
+
     def __init__(self, odrv, gear_ratio_xto1: float = 1):
         self.odrv = odrv
         self.mvmts = mvm.position_movements(odrv, gear_ratio_xto1)
@@ -41,6 +42,7 @@ class PlotMe:
         ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=10, cache_frame_data=False)
         plt.show()
 
+
     def plot_circle_pos(self):
         '''Plot the position of the motor on a circle'''
 
@@ -50,8 +52,6 @@ class PlotMe:
             deg = pos * 360
             return deg
 
-
-   
         def update(frame):
             angle = get_sensor_angle()
             angle = -angle  # Invertiere den Winkel, um die Bewegung des Plots zu invertieren
@@ -96,10 +96,11 @@ class PlotMe:
         # Live-Plot anzeigen
         plt.show()
 
-gear_ratio = 9
-cc = concal.Utils()
-my_drive = cc.find_one_odrive()
-my_plot = PlotMe(my_drive, 9)
+# uncomment if main file
+#gear_ratio = 9
+#cc = concal.Utils()
+#my_drive = cc.find_one_odrive()
+#my_plot = PlotMe(my_drive, 9)
 
 #my_plot.plot_position()
-my_plot.plot_circle_pos()
+#my_plot.plot_circle_pos()
