@@ -21,10 +21,19 @@ class Utils:
     # Tolerance for encoder offset float
     ENCODER_OFFSET_FLOAT_TOLERANCE = 0.05
 
+    # The different motor states are defined as variables, because the changed in the past already in form of naming
+    closed_loop = AxisState.CLOSED_LOOP_CONTROL
+    idle = AxisState.IDLE
+    calibration_state = AxisState.MOTOR_CALIBRATION
+    full_calibration_seq = AxisState.FULL_CALIBRATION_SEQUENCE
+    encoder_offset = AxisState.ENCODER_OFFSET_CALIBRATION
+
+
     def _find_odrive(self):
         # connect to Odrive
         self.odrv = odrive.find_any(timeout=15)
         self.odrv_axis = getattr(self.odrv, "axis{}".format(self.axis_num))
+        self.odrv_axis = self.odrv.axis0
 
     def find_one_odrive(self):
         ''' 
@@ -147,7 +156,7 @@ class Utils:
         self.odrv_axis.controller.config = ControlMode.POSITION_CONTROL
 
         # Motor must be in IDLE mode before saving
-        self.odrv_axis.requested_state = AxisState.IDLE
+        self.odrv_axis.requested_state = self.idle
         try:
             print("Saving manual configuration and rebooting...")
             is_saved = self.odrv.save_configuration()
@@ -166,7 +175,7 @@ class Utils:
 
         print("Calibrating Odrive for motor (you should hear a " "beep)...")
 
-        self.odrv_axis.requested_state = AxisState.MOTOR_CALIBRATION
+        self.odrv_axis.requested_state = self.calibration_state
 
         # Wait for calibration to take place
         time.sleep(15)
@@ -234,7 +243,7 @@ class Utils:
             sys.exit(1)
 
         print("Calibrating Odrive for encoder offset...")
-        self.odrv_axis.requested_state = AxisState.ENCODER_OFFSET_CALIBRATION
+        self.odrv_axis.requested_state = self.encoder_offset
 
         # Wait for calibration to take place
         time.sleep(30)
@@ -255,7 +264,7 @@ class Utils:
         self.odrv_axis.encoder.config.pre_calibrated = True
 
         print("Calibrating Odrive for anticogging...")
-        self.odrv_axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
+        self.odrv_axis.requested_state = self.closed_loop
 
         self.odrv_axis.controller.start_anticogging_calibration()
 
@@ -279,7 +288,7 @@ class Utils:
         self.odrv_axis.controller.config.anticogging.pre_calibrated = True
 
         # Motors must be in IDLE mode before saving
-        self.odrv_axis.requested_state = AxisState.IDLE
+        self.odrv_axis.requested_state = self.idle
         try:
             print("Saving calibration configuration and rebooting...")
             self.odrv.save_configuration()
@@ -300,15 +309,15 @@ class Utils:
         Input argument looks like this: odrive.axis0 
         '''
         print("Calibrating motor...")
-        motor.requested_state = AxisState.FULL_CALIBRATION_SEQUENCE
-        while motor.current_state != AxisState.IDLE:
+        motor.requested_state = self.full_calibration_seq
+        while motor.current_state != self.idle:
             time.sleep(0.1)
         print("Motor calibrated.")
-        motor.requested_state = AxisState.CLOSED_LOOP_CONTROL
+        motor.requested_state = self.closed_loop
 
     def print_GPIO_voltage(self, odrv):
         ''' 
-        Print the voltage on GPIO pinS.
+        Print the voltage on GPIO pins.
         Input arguments look like this: my_drive (odrive object)
         '''
         for i in [1,2,3,4]:
