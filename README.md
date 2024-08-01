@@ -20,6 +20,8 @@ The odrive_qdd Interface is a powerful tool for configuring, controlling, and ma
     ```bash
     pip install odrive
     pip install pynput
+    pip install matplotlib
+    pip install numpy
     ```
 
 ### Usage
@@ -28,7 +30,7 @@ For quick start, plug in the USB-C cable to your odrive (which is already config
 then connect your odrive to power connection and now you can
 run the src/odrive_usb_demo.py
 with 
-```python
+```bash
 cd path/to/your/directory/odrive_qdd
 python src/odrive_usb_demo
 ```
