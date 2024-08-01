@@ -54,53 +54,54 @@ class PlotMe:
 
         def update(frame):
             angle = get_sensor_angle()
-            angle = -angle  # Invertiere den Winkel, um die Bewegung des Plots zu invertieren
-            # Objekt aktueller Untersuchung!!!! wie könnte man es noch lösen, anstatt ein minus vor den angle
-            # Aktualisiere den Titel des Plots mit dem neuen Winkel
-            ax.set_title(f"Winkel: {-angle:.2f} Grad")
+            angle = -angle  # invert the angle to invert the movement of the plot
 
-            # Lösche vorherige Linien und Punkte
+            # object of current investigation!!! how could you solve it without the minus in front of the angle
+            
+            # Update the title of the plot with the new angle
+            ax.set_title(f"Angle: {-angle:.2f} Degrees")
+
+            # Delete the old line
             if self.line is not None:
                 self.line.remove()
-            # Konvertiere den Winkel von Grad in Bogenmaß
+            # convert angle to radians
             angle_rad = np.deg2rad(angle)
 
-            # Koordinaten für den Punkt auf dem Kreisrand
+            # Coordinates of the new angle point
             x = np.cos(angle_rad)
             y = np.sin(angle_rad)
 
-            # Zeichne den neuen Winkelpunkt
-            #ax.plot([0, x], [0, y], marker='o', color='red')
+            # Plot the new line
             self.line, = ax.plot([0, x], [0, y], marker='o', color='red')
 
-        # Erstellen des Kreises
+        # Create a circle
         circle = plt.Circle((0, 0), 1, color='blue', fill=False)
 
-        # Erstellen der Abbildung und der Achsen
+        # Create a figure and axis
         fig, ax = plt.subplots()
 
-        # Kreis hinzufügen
+        # add the circle
         ax.add_artist(circle)
 
-        # Achsenverhältnisse gleich setzen und Limiten festlegen
+        # set the aspect of the plot to be equal
         ax.set_aspect('equal')
         ax.set_xlim(-1.5, 1.5)
         ax.set_ylim(-1.5, 1.5)
 
-        # Gitternetz anzeigen
+        # show grid
         plt.grid(True)
 
-        # Animation erstellen
-        ani = FuncAnimation(fig, update, interval=100, cache_frame_data=False)  # Interval in Millisekunden
+        # create the animation
+        ani = FuncAnimation(fig, update, interval=100, cache_frame_data=False)  # Interval in ms, for smoother animations decrease the interval
 
-        # Live-Plot anzeigen
         plt.show()
 
-# uncomment if main file
-#gear_ratio = 9
-#cc = concal.Utils()
-#my_drive = cc.find_one_odrive()
-#my_plot = PlotMe(my_drive, 9)
 
-#my_plot.plot_position()
-#my_plot.plot_circle_pos()
+if __name__ == "__main__":
+    gear_ratio = 9
+    cc = concal.Utils()
+    my_drive = cc.find_one_odrive()
+    my_plot = PlotMe(my_drive, 9)
+
+    my_plot.plot_position()
+    my_plot.plot_circle_pos()
