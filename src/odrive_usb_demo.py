@@ -34,17 +34,17 @@ def control():
     vel_move.control_by_input()
 
 
-# Erstelle und starte Control-Thread
+# create a thread for the control loop
 control_thread = threading.Thread(target=control)
 control_thread.start()
 
-# Plotten im Hauptthread
+# plot in the background
 t0 = time.monotonic()
 try:
     plt.plot_circle_pos()
 
     while True:
-        # Eine Sinuswelle zum Testen
+        # A sine wacve movement
         move.sine_wave(t0)
 
   
@@ -53,5 +53,5 @@ except KeyboardInterrupt:
     print("Ctrl + C pressed. Motor stopped.")
     pass
 
-# Warte auf den Control-Thread
+# wait for the control thread to finish
 control_thread.join()
