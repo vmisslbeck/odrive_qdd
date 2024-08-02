@@ -128,11 +128,29 @@ class Utils:
         self.odrv.axis0.controller.config.vel_limit_tolerance = 1.1666666666666667
         self.odrv.axis0.config.torque_soft_min = -0.404
         self.odrv.axis0.config.torque_soft_max = 0.404
-        self.odrv.can.config.protocol = Protocol.NONE
-        self.odrv.config.enable_uart_a = False
+
+        # enable CAN communication
+        self.odrv.can.config.protocol = Protocol.SIMPLE
+        self.odrv.can.config.baud_rate = 250000
+        self.odrv.axis0.config.can_node_id = 0
+        self.odrv.axis0.config.can.heartbeat_rate_ms = 100
+        self.odrv.axis0.config.can.encoder_msg_rate_ms = 10
+        self.odrv.axis0.config.can.iq_msg_rate_ms = 10
+        self.odrv.axis0.config.can.torques_msg_rate_ms = 10
+        self.odrv.axis0.config.can.error_msg_rate_ms = 10
+        self.odrv.axis0.config.can.temperature_msg_rate_ms = 10
+        self.odrv.axis0.config.can.bus_voltage_msg_rate_ms = 10
+        self.odrv.axis0.config.enable_watchdog = False
+
         # For the BLDC we use the onboard encoder on the back of the odrive.
         self.odrv.axis0.config.load_encoder = EncoderId.ONBOARD_ENCODER0
-        self.odrv.axis0.config.commutation_encoder = EncoderId.ONBOARD_ENCODER0        
+        self.odrv.axis0.config.commutation_encoder = EncoderId.ONBOARD_ENCODER0     
+
+        # enable UART communication
+        self.odrv.config.enable_uart_a = True
+        self.odrv.config.gpio7_mode = GpioMode.UART_A
+        self.odrv.config.gpio6_mode = GpioMode.UART_A
+        self.odrv.config.uart_a_baudrate = 115200
 
 
     def configure_odrive(self):
