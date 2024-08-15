@@ -21,7 +21,7 @@ class PlotMe:
         xs = []
         ys = []
 
-        def animate(i, xs, ys):
+        def animate(self, xs, ys):
             pos = round(self.mvmts.get_rel_pos(), 5)
 
             xs.append(len(xs))

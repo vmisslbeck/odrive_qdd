@@ -4,6 +4,7 @@ import odrive
 from odrive.enums import *
 import time
 import sys
+from unittest.mock import MagicMock, patch
 
 class Utils:
 
@@ -28,25 +29,54 @@ class Utils:
     full_calibration_seq = AxisState.FULL_CALIBRATION_SEQUENCE
     encoder_offset = AxisState.ENCODER_OFFSET_CALIBRATION
 
+    def __init__(self, mock_odrive: bool = False):
 
-    def _find_odrive(self):
-        # connect to Odrive
-        self.odrv = odrive.find_any(timeout=15)
-        self.odrv_axis = getattr(self.odrv, "axis{}".format(self.axis_num))
-        self.odrv_axis = self.odrv.axis0
+        '''
+        Initialize the Utils class with the mock_odrive object.
+        Input arguments look like this: mock_odrive (odrive object), axis_num (int), erase_config (bool)
+        '''
+        # One thing to mention: if one day the term axis0 is replaced by whatever, you will have to change every appearences
+        # or implement here via a class variable, bur I don't have the time for that right now.
+        #self.odrvax = self.odrv.axis0
+
+        self.mock_status = mock_odrive
+
 
     def find_one_odrive(self):
         ''' 
         Find a connected ODrive (this will block until you connect one)
         '''
-        print("finding an odrive...")
-        odrv = odrive.find_any()
-        print("Odrive found!")
-        odrv.clear_errors()
-        time.sleep(0.5)
-        time.sleep(1)
-        odrv.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
-        return odrv
+        if self.mock_status:
+            mock_odrive = MagicMock()
+
+            # Simulieren Sie die Methoden und Attribute, die Sie benötigen
+            mock_odrive.clear_errors = MagicMock()
+            mock_odrive.axis0 = MagicMock()
+            mock_odrive.axis0.controller = MagicMock()
+            
+            mock_odrive.axis0.disarm_reason = 0
+            mock_odrive.axis0.controller.pos_setpoint = 0
+            mock_odrive.axis0.pos_vel_mapper.pos_rel = 0.69
+            mock_odrive.vbus_voltage = 24.42069
+
+            print("finding an odrive...")
+            # Patchen Sie die find_any Methode, um das Mock-Objekt zurückzugeben
+            with patch('odrive.find_any', return_value=mock_odrive):
+                # Jetzt wird odrive.find_any() das Mock-Objekt zurückgeben
+                odrv = odrive.find_any()
+            print("Odrive found!")
+            return odrv
+        
+        else:
+            print("finding an odrive...")
+            odrv = odrive.find_any()
+            print("Odrive found!")
+            odrv.clear_errors()
+            time.sleep(0.5)
+            time.sleep(1)
+            odrv.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
+            return odrv
+
 
     def find_all_odrives(self):
         '''
@@ -65,6 +95,13 @@ class Utils:
             od_list.append(odrv)
 
         return od_list
+    
+    def _find_odrive(self):
+        '''This find_odrive is only for configuring reasons. It is not for the user to call it.'''
+        # connect to Odrive
+        self.odrv = odrive.find_any(timeout=15)
+        self.odrv_axis = getattr(self.odrv, "axis{}".format(self.axis_num))
+        self.odrv_axis = self.odrv.axis0    
 
     def clear_errors(self):
         """

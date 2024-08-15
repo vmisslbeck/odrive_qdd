@@ -11,7 +11,7 @@ import odrv_movements as mvmts
 import odrv_con_and_calib as concal
 import odrv_plot as oplot
 
-cc = concal.Utils()
+cc = concal.Utils(mock_odrive=True) # Use the mock_odrive=True to use the mock odrive. This is useful for testing without the hardware
 
 my_drive = cc.find_one_odrive()
 cc.check_voltage(my_drive)
@@ -43,6 +43,7 @@ t0 = time.monotonic()
 try:
     plt.plot_circle_pos()
 
+    print("Here comes the sine wave")
     while True:
         # A sine wacve movement
         move.sine_wave(t0)
