@@ -5,6 +5,7 @@ from odrive.enums import *
 import time
 import sys
 from unittest.mock import MagicMock, patch
+import threading
 
 class Utils:
 
@@ -46,6 +47,7 @@ class Utils:
         ''' 
         Find a connected ODrive (this will block until you connect one)
         '''
+        # MOCK ODRIVE
         if self.mock_status:
             mock_odrive = MagicMock()
 
@@ -53,20 +55,33 @@ class Utils:
             mock_odrive.clear_errors = MagicMock()
             mock_odrive.axis0 = MagicMock()
             mock_odrive.axis0.controller = MagicMock()
-            
+
             mock_odrive.axis0.disarm_reason = 0
             mock_odrive.axis0.controller.pos_setpoint = 0
-            mock_odrive.axis0.pos_vel_mapper.pos_rel = 0.69
+            mock_odrive.axis0.controller.input_pos = 0.69
+            mock_odrive.axis0.controller.input_vel = 0
+            mock_odrive.axis0.pos_vel_mapper.pos_rel = mock_odrive.axis0.controller.input_pos
             mock_odrive.vbus_voltage = 24.42069
 
+            # Background thread to update the position sensor
+            def update_position_sensor():
+                while True:
+                    if mock_odrive.axis0.controller.input_vel != 0:
+                        mock_odrive.axis0.pos_vel_mapper.pos_rel += mock_odrive.axis0.controller.input_vel * 0.1
+                    time.sleep(0.1)
+
+            # Start the background thread
+            threading.Thread(target=update_position_sensor, daemon=True).start()
+
             print("finding an odrive...")
-            # Patchen Sie die find_any Methode, um das Mock-Objekt zurückzugeben
+
             with patch('odrive.find_any', return_value=mock_odrive):
                 # Jetzt wird odrive.find_any() das Mock-Objekt zurückgeben
                 odrv = odrive.find_any()
             print("Odrive found!")
             return odrv
         
+        # REAL ODRIVE
         else:
             print("finding an odrive...")
             odrv = odrive.find_any()

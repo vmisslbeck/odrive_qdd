@@ -11,12 +11,11 @@ import odrv_movements as mvmts
 import odrv_con_and_calib as concal
 import odrv_plot as oplot
 
-cc = concal.Utils(mock_odrive=True) # Use the mock_odrive=True to use the mock odrive. This is useful for testing without the hardware
+cc = concal.Utils(mock_odrive=True) # Use mock_odrive=True to use the mock odrive. This is useful for testing without the hardware
 
 my_drive = cc.find_one_odrive()
 cc.check_voltage(my_drive)
 
-# my_drive.clear_errors() # this clear_errors is critical, otherwise we always get ERRORS
 my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
 
 gear_ratio_x_to_1 = 9  # set this to the gear ratio of your motor, if no gear, set it to 1
@@ -45,8 +44,9 @@ try:
 
     print("Here comes the sine wave")
     while True:
-        # A sine wacve movement
+        # A sine wave movement
         move.sine_wave(t0)
+        #print("setpoint: " + str(my_drive.axis0.controller.input_pos))
 
   
 except KeyboardInterrupt:

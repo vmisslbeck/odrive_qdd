@@ -44,13 +44,21 @@ To use the ODrive Framework, follow these steps:
 
     ```python
     import odrive
-    import odrive_qdd
+    from odrive_qdd import odrv_con_and_calib as concal, odrv_movemnts as mvmts
     ```
 
 2. Initialize the ODrive controller:
 
     ```python
-    odrv = odrive.find_any()
+    cc = concal.Utils(mock_odrive=True) # Use mock_odrive=True to mock a odrive connection. This is useful for testing without the hardware # leave empty for using a real odrive
+    my_drive = cc.find_one_odrive()
+
+    gear_ratio_x_to_1 = 9  # set this to the gear ratio of your motor, if no gear, set it to 1
+    move = mvmts.position_movements(my_drive, gear_ratio_x_to_1)
+    vel_move = mvmts.velocity_movements(my_drive)
+    while True:
+        # A sine wave movement
+        move.sine_wave(t0)
     ```
 
 3. Configure and control your motors using the provided functions and APIs.
